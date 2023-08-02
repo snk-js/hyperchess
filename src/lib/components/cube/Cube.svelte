@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { T } from '@threlte/core';
 	import { BoxGeometry } from 'three';
-
+	import Piece from '../piece/Piece.svelte';
+	import InnerCube from '../innerCube/innerCube.svelte';
 	const cubesPerDimension = 8;
 	const totalSize = 3;
 	const cubeSize = totalSize / cubesPerDimension;
@@ -11,7 +12,7 @@
 	let time = 0; // Initialize time.
 	// Increment the time variable in the animation frame for the heartbeat effect.
 	function animate() {
-		time += 0.05;
+		time += 0.01;
 		requestAnimationFrame(animate);
 	}
 	animate();
@@ -39,23 +40,16 @@
 							]}
 						/>
 					</T.LineSegments>
-					<!-- Add a smaller cube inside the box. -->
-					<T.Mesh
+					<InnerCube
+						{time}
 						position={[
 							(i * cubeSize) / multiplier,
 							(j * cubeSize) / multiplier,
 							(k * cubeSize) / multiplier
 						]}
-						scale={[
-							Math.sin(time) * innerCubeSize,
-							Math.sin(time) * innerCubeSize,
-							Math.sin(time) * innerCubeSize
-						]}
-					>
-						<T.BoxGeometry args={[innerCubeSize, innerCubeSize, innerCubeSize]} />
-						<T.MeshBasicMaterial color="#ff0000" />
-						<!-- Make the inner cube red for visibility. -->
-					</T.Mesh>
+						{innerCubeSize}
+						pieceName={i === 0 && j === 0 && k === 0 ? 'Queen' : ''}
+					/>
 				</T.Mesh>
 			{/each}
 		{/each}

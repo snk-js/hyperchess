@@ -13,6 +13,7 @@ Title: Chess Scene Pieces / Blender
 	import { useGltf } from '@threlte/extras';
 
 	export const ref = new Group();
+	export const pieceName = '';
 
 	const gltf = useGltf('/src/lib/components/piece/scene-transformed.glb', { useDraco: true });
 
@@ -26,39 +27,10 @@ Title: Chess Scene Pieces / Blender
 		<T.Group position={[-0.75, 0, 0]} rotation={[-Math.PI / 2, 0, -Math.PI]}>
 			<T.Group position={[0, 0, 2]}>
 				<T.Mesh
-					geometry={gltf.nodes.WhiteKnight001_0.geometry}
-					material={gltf.materials.Root}
-					position={[3, 0, 0]}
-					scale={1.33}
-				/>
-				<T.Mesh
-					geometry={gltf.nodes.Rook001_0.geometry}
-					material={gltf.materials.Root}
-					position={[9, 0, 0]}
-					scale={1.33}
-				/>
-				<T.Mesh
-					geometry={gltf.nodes.PrimaryWhitePawn007_0.geometry}
-					material={gltf.materials.White_Piece}
-					position={[15, 0, 0]}
-					scale={0.72}
-				/>
-				<T.Mesh
-					geometry={gltf.nodes.PrimaryWhiteBishop001_0.geometry}
-					material={gltf.materials.Root}
-					position={[-3, 0, 0]}
-					scale={0.24}
-				/>
-				<T.Mesh
 					geometry={gltf.nodes.WhiteQueen_0.geometry}
 					material={gltf.materials.Root}
-					position={[-9, 0, 0]}
-					scale={0.24}
-				/>
-				<T.Mesh
-					geometry={gltf.nodes.WhiteKing_0.geometry}
-					material={gltf.materials.Root}
-					position={[-15, 0, 0]}
+					position={[0, 0, 0]}
+					scale={0.1}
 				/>
 			</T.Group>
 		</T.Group>

@@ -22,6 +22,5 @@
 /> -->
 
 <Cube />
-<Piece />
 
 <ContactShadows scale={10} blur={2} far={2.5} opacity={0.5} />
