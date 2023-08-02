@@ -9,13 +9,6 @@
 	const centralizedSize = 1 + (1 - cubeSize) / 2;
 	const innerCubeSize = cubeSize / 4;
 	const multiplier = 25;
-	let time = 0; // Initialize time.
-	// Increment the time variable in the animation frame for the heartbeat effect.
-	function animate() {
-		time += 0.01;
-		requestAnimationFrame(animate);
-	}
-	animate();
 </script>
 
 <T.Mesh
@@ -41,7 +34,6 @@
 						/>
 					</T.LineSegments>
 					<InnerCube
-						{time}
 						position={[
 							(i * cubeSize) / multiplier,
 							(j * cubeSize) / multiplier,
