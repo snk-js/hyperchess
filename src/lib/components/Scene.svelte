@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { T } from '@threlte/core';
-	import { ContactShadows, Float, Grid, OrbitControls } from '@threlte/extras';
+	import { ContactShadows, OrbitControls } from '@threlte/extras';
 	import Cube from './cube/Cube.svelte';
+	import Piece from './piece/Piece.svelte';
 </script>
 
 <T.PerspectiveCamera makeDefault position={[-10, 10, 10]} fov={15}>
@@ -21,5 +22,6 @@
 /> -->
 
 <Cube />
+<Piece />
 
 <ContactShadows scale={10} blur={2} far={2.5} opacity={0.5} />
