@@ -11,15 +11,17 @@ Title: Chess Scene Pieces / Blender
 	import { Group } from 'three';
 	import { T, forwardEventHandlers } from '@threlte/core';
 	import { useGltf } from '@threlte/extras';
-
+	import { interactivity } from '@threlte/extras';
 	export const ref = new Group();
 	export const pieceName = '';
 
+	interactivity();
 	const gltf = useGltf('/src/lib/components/piece/scene-transformed.glb', { useDraco: true });
 
 	const component = forwardEventHandlers();
 </script>
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <T is={ref} dispose={false} {...$$restProps} bind:this={$component}>
 	{#await gltf}
 		<slot name="fallback" />
@@ -27,6 +29,7 @@ Title: Chess Scene Pieces / Blender
 		<T.Group position={[-0.75, 0, 0]} rotation={[-Math.PI / 2, 0, -Math.PI]}>
 			<T.Group position={[0, 0, 2]}>
 				<T.Mesh
+					on:pointerover={() => console.log('Mouse pointer entered the object')}
 					geometry={gltf.nodes.WhiteQueen_0.geometry}
 					material={gltf.materials.Root}
 					position={[0, 0, 0]}

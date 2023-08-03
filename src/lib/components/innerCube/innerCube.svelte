@@ -2,33 +2,18 @@
 	import { T } from '@threlte/core';
 	import Piece from '../piece/Piece.svelte';
 	export let position: [number, number, number] = [0, 0, 0];
-	export let innerCubeSize = 1;
 	export let pieceName: string = '';
-	let time = 0; // Initialize time.
-	// Increment the time variable in the animation frame for the heartbeat effect.
-	function animate() {
-		if (pieceName) return;
-		time += 0.01;
-		requestAnimationFrame(animate);
-	}
-	animate();
 </script>
 
 <T.Mesh
-	{position}
-	scale={pieceName
-		? [0.1, 0.1, 0.1]
-		: [
-				Math.sin(time) * innerCubeSize,
-				Math.sin(time) * innerCubeSize,
-				Math.sin(time) * innerCubeSize
-		  ]}
+	on:pointerenter={(e) => console.log('enter')}
+	position={pieceName ? [0.08, -0.37, 0] : position}
+	scale={[0.1, 0.1, 0.1]}
 >
-	<T.BoxGeometry args={[innerCubeSize, innerCubeSize, innerCubeSize]} />
-	<T.MeshBasicMaterial color="#ff0000" />
-
-	<!-- Piece placement -->
 	{#if pieceName}
 		<Piece name={pieceName} />
+	{:else}
+		<T.BoxGeometry args={[0, 0, 0]} />
+		<T.MeshBasicMaterial color="#ff0000" />
 	{/if}
 </T.Mesh>

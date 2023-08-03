@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { T } from '@threlte/core';
 	import { BoxGeometry } from 'three';
-	import Piece from '../piece/Piece.svelte';
 	import InnerCube from '../innerCube/innerCube.svelte';
 	const cubesPerDimension = 8;
 	const totalSize = 3;
@@ -23,11 +22,17 @@
 				<T.Mesh position={[i * cubeSize, j * cubeSize, k * cubeSize]}>
 					<T.LineSegments>
 						<T.EdgesGeometry args={[new BoxGeometry(cubeSize, cubeSize, cubeSize)]} />
+						{#if i === 3 && j === 3 && k === 3}
+							<T.Mesh scale={4}>
+								<T.BoxGeometry args={[innerCubeSize, innerCubeSize, innerCubeSize]} />
+								<T.MeshBasicMaterial color="#ff0000" opacity={0.3} transparent={true} />
+							</T.Mesh>
+						{/if}
 						<T.MeshBasicMaterial
 							args={[
 								{
 									color: 0xffffff,
-									opacity: 0.1,
+									opacity: 0.03,
 									transparent: true
 								}
 							]}
@@ -39,8 +44,7 @@
 							(j * cubeSize) / multiplier,
 							(k * cubeSize) / multiplier
 						]}
-						{innerCubeSize}
-						pieceName={i === 0 && j === 0 && k === 0 ? 'Queen' : ''}
+						pieceName={i === 3 && j === 3 && k === 3 ? 'Queen' : ''}
 					/>
 				</T.Mesh>
 			{/each}
