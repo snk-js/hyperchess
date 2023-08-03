@@ -1,3 +1,9 @@
+
+
+https://github.com/snk-js/hyperchess/assets/34718184/c7e7333a-2633-49e7-b4ee-79b1d551a73f
+
+
+
 # create-svelte
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
