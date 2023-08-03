@@ -2,12 +2,21 @@
 	import { T } from '@threlte/core';
 	import { BoxGeometry } from 'three';
 	import InnerCube from '../innerCube/innerCube.svelte';
+	import { board } from '$lib/store';
+	import type { Board } from '$lib/store';
+
 	const cubesPerDimension = 8;
 	const totalSize = 3;
 	const cubeSize = totalSize / cubesPerDimension;
 	const centralizedSize = 1 + (1 - cubeSize) / 2;
 	const innerCubeSize = cubeSize / 4;
 	const multiplier = 25;
+
+	let boardState: Board;
+
+	board.subscribe((value) => {
+		boardState = value;
+	});
 </script>
 
 <T.Mesh
@@ -44,7 +53,7 @@
 							(j * cubeSize) / multiplier,
 							(k * cubeSize) / multiplier
 						]}
-						pieceName={i === 3 && j === 3 && k === 3 ? 'Queen' : ''}
+						pieceName={boardState[i][j][k].piece}
 					/>
 				</T.Mesh>
 			{/each}

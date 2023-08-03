@@ -5,11 +5,7 @@
 	export let pieceName: string = '';
 </script>
 
-<T.Mesh
-	on:pointerenter={(e) => console.log('enter')}
-	position={pieceName ? [0.08, -0.37, 0] : position}
-	scale={[0.1, 0.1, 0.1]}
->
+<T.Mesh position={pieceName ? [0.08, -0.37, 0] : position} scale={[0.1, 0.1, 0.1]}>
 	{#if pieceName}
 		<Piece name={pieceName} />
 	{:else}
