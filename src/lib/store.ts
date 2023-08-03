@@ -1,12 +1,19 @@
 import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 
-type Piece = 'queen' | 'king' | 'bishop' | 'knight' | 'rook' | 'pawn' | '';
+export type Piece = 'queen' | 'king' | 'bishop' | 'knight' | 'rook' | 'pawn' | '';
 
-interface Cell {
+// ----------------------->  x,      y,       z
+export type PieceCoords = [number, number, number];
+
+export interface Cell {
 	piece: Piece;
 	selected: boolean;
+	activated: boolean;
+	coords: PieceCoords;
 }
+
+export const dummyCell = { piece: '', selected: false, activated: false, coords: [0, 0, 0] };
 
 export type Board = Cell[][][];
 
@@ -15,13 +22,21 @@ function createEmptyBoard(size: 8): Board {
 	for (let i = 0; i < size; i++) {
 		board[i] = new Array(size);
 		for (let j = 0; j < size; j++) {
-			board[i][j] = new Array(size).fill({ piece: '', selected: false });
+			board[i][j] = new Array(size);
+			for (let k = 0; k < size; k++) {
+				board[i][j][k] = { piece: '', selected: false, activated: false, coords: [i, j, k] };
+			}
 		}
 	}
 	return board;
 }
 
 const initialBoard: Board = createEmptyBoard(8);
-initialBoard[3][3][3] = { piece: 'queen', selected: false };
+initialBoard[3][3][3] = {
+	...initialBoard[3][3][3],
+	piece: 'queen',
+	selected: false,
+	activated: false
+};
 
 export const board: Writable<Board> = writable(initialBoard);

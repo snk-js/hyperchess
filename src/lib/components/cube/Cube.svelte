@@ -28,10 +28,10 @@
 	{#each Array(cubesPerDimension) as _, i}
 		{#each Array(cubesPerDimension) as _, j}
 			{#each Array(cubesPerDimension) as _, k}
-				<T.Mesh position={[i * cubeSize, j * cubeSize, k * cubeSize]}>
+				<T.Mesh key={i + ',' + j + ',' + k} position={[i * cubeSize, j * cubeSize, k * cubeSize]}>
 					<T.LineSegments>
 						<T.EdgesGeometry args={[new BoxGeometry(cubeSize, cubeSize, cubeSize)]} />
-						{#if i === 3 && j === 3 && k === 3}
+						{#if boardState[i][j][k].activated}
 							<T.Mesh scale={4}>
 								<T.BoxGeometry args={[innerCubeSize, innerCubeSize, innerCubeSize]} />
 								<T.MeshBasicMaterial color="#ff0000" opacity={0.3} transparent={true} />
@@ -53,7 +53,7 @@
 							(j * cubeSize) / multiplier,
 							(k * cubeSize) / multiplier
 						]}
-						pieceName={boardState[i][j][k].piece}
+						idx={[i, j, k]}
 					/>
 				</T.Mesh>
 			{/each}
