@@ -9,7 +9,7 @@
 
 	export const ref = new Group();
 	export let idx: PieceCoords = [0, 0, 0];
-	let coords;
+	let coords: PieceCoords;
 
 	$: {
 		const cell = get(board)[idx[0]][idx[1]][idx[2]];
@@ -25,12 +25,26 @@
 		});
 	};
 
+	const selectCell = () => {
+		board.update((value) => {
+			const [x, y, z] = coords;
+			if (value[x][y][z]) {
+				value[x][y][z].selected = !value[x][y][z].selected;
+			}
+			return value;
+		});
+	};
+
 	const handlePointerOver = () => {
 		updateCell(true);
 	};
 
 	const handleMouseLeave = () => {
 		updateCell(false);
+	};
+
+	const handleClick = () => {
+		selectCell();
 	};
 
 	interactivity();
@@ -47,6 +61,7 @@
 				<T.Mesh
 					on:pointerover={handlePointerOver}
 					on:pointerout={handleMouseLeave}
+					on:click={handleClick}
 					geometry={gltf.nodes.WhiteQueen_0.geometry}
 					material={gltf.materials.Root}
 					position={[0, 0, 0]}

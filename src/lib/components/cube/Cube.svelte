@@ -3,7 +3,8 @@
 	import { BoxGeometry } from 'three';
 	import InnerCube from '../innerCube/innerCube.svelte';
 	import { board } from '$lib/store';
-	import type { Board } from '$lib/store';
+	import type { Board, PieceCoords } from '$lib/store';
+	import CubeStatus from '../cubeStatus/CubeStatus.svelte';
 
 	const cubesPerDimension = 8;
 	const totalSize = 3;
@@ -13,6 +14,7 @@
 	const multiplier = 25;
 
 	let boardState: Board;
+	let highlighted: PieceCoords[] = [];
 
 	board.subscribe((value) => {
 		boardState = value;
@@ -31,21 +33,7 @@
 				<T.Mesh key={i + ',' + j + ',' + k} position={[i * cubeSize, j * cubeSize, k * cubeSize]}>
 					<T.LineSegments>
 						<T.EdgesGeometry args={[new BoxGeometry(cubeSize, cubeSize, cubeSize)]} />
-						{#if boardState[i][j][k].activated}
-							<T.Mesh scale={4}>
-								<T.BoxGeometry args={[innerCubeSize, innerCubeSize, innerCubeSize]} />
-								<T.MeshBasicMaterial color="#ff0000" opacity={0.3} transparent={true} />
-							</T.Mesh>
-						{/if}
-						<T.MeshBasicMaterial
-							args={[
-								{
-									color: 0xffffff,
-									opacity: 0.03,
-									transparent: true
-								}
-							]}
-						/>
+						<CubeStatus activated={boardState[i][j][k].activated} {innerCubeSize} />
 					</T.LineSegments>
 					<InnerCube
 						position={[

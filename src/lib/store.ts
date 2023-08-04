@@ -3,6 +3,8 @@ import type { Writable } from 'svelte/store';
 
 export type Piece = 'queen' | 'king' | 'bishop' | 'knight' | 'rook' | 'pawn' | '';
 
+const BOARDSIZE = 8;
+
 // ----------------------->  x,      y,       z
 export type PieceCoords = [number, number, number];
 
@@ -31,7 +33,7 @@ function createEmptyBoard(size: 8): Board {
 	return board;
 }
 
-const initialBoard: Board = createEmptyBoard(8);
+const initialBoard: Board = createEmptyBoard(BOARDSIZE);
 initialBoard[3][3][3] = {
 	...initialBoard[3][3][3],
 	piece: 'queen',
