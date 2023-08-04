@@ -13,7 +13,7 @@
 	$: {
 		const cell = get(board)[idx[0]][idx[1]][idx[2]];
 		coords = cell.coords;
-		piece = cell.piece;
+		piece = cell.piece || '';
 	}
 </script>
 

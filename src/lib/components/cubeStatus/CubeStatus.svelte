@@ -1,24 +1,43 @@
 <!-- CubeStatus.svelte -->
 <script lang="ts">
 	import { T } from '@threlte/core';
-	import type { MeshBasicMaterialParameters } from 'three';
 	import { dummyCell } from '$lib/store';
+	import type { Cell } from '$lib/store';
 
-	export let cell = dummyCell;
+	import { tweened } from 'svelte/motion';
+	import { backInOut } from 'svelte/easing';
+
+	import { updateBox } from './boxState';
+
+	export let cell: Cell = dummyCell;
 	export let innerCubeSize: number;
 
-	let materialArgs: MeshBasicMaterialParameters;
+	const scale = tweened(0, {
+		duration: 200,
+		easing: backInOut
+	});
+
 	$: {
-		materialArgs = cell.activated
-			? { color: 0xff0000, transparent: true }
-			: { color: 0xffffff, opacity: 0.03, transparent: true };
+		if (cell.activated) {
+			scale.set(4);
+		} else {
+			scale.set(0);
+		}
+	}
+
+	let defaultEdges = updateBox(cell).mesh;
+	let defaultInnerColor = updateBox(cell).inner;
+
+	$: {
+		const { inner, mesh } = updateBox(cell);
+		defaultEdges = mesh;
+		defaultInnerColor = inner;
 	}
 </script>
 
-{#if cell.activated}
-	<T.Mesh scale={4}>
-		<T.BoxGeometry args={[innerCubeSize, innerCubeSize, innerCubeSize]} />
-		<T.MeshBasicMaterial color="#ff0000" opacity={0.3} transparent={true} />
-	</T.Mesh>
-{/if}
-<T.MeshBasicMaterial args={[materialArgs]} />
+<T.Mesh scale={$scale}>
+	<T.BoxGeometry args={[innerCubeSize, innerCubeSize, innerCubeSize]} />
+	<T.MeshBasicMaterial args={[defaultInnerColor]} />
+</T.Mesh>
+
+<T.MeshBasicMaterial args={[defaultEdges]} />

@@ -13,25 +13,33 @@ export interface Cell {
 	selected: boolean;
 	activated: boolean;
 	coords: PieceCoords;
+	highlighted: boolean;
 }
 
 export const dummyCell: Cell = {
 	piece: '' as Piece,
 	selected: false,
 	activated: false,
-	coords: [0, 0, 0]
+	coords: [0, 0, 0],
+	highlighted: false
 };
 
 export type Board = Cell[][][];
 
-function createEmptyBoard(size: 8): Board {
+function createEmptyBoard(size = BOARDSIZE): Board {
 	const board: Board = new Array(size);
 	for (let i = 0; i < size; i++) {
 		board[i] = new Array(size);
 		for (let j = 0; j < size; j++) {
 			board[i][j] = new Array(size);
 			for (let k = 0; k < size; k++) {
-				board[i][j][k] = { piece: '', selected: false, activated: false, coords: [i, j, k] };
+				board[i][j][k] = {
+					piece: '',
+					selected: false,
+					activated: false,
+					coords: [i, j, k],
+					highlighted: false
+				};
 			}
 		}
 	}
