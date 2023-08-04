@@ -14,9 +14,8 @@
 	const multiplier = 25;
 
 	let boardState: Board;
-	let highlighted: PieceCoords[] = [];
 
-	board.subscribe((value) => {
+	$: board.subscribe((value: Board) => {
 		boardState = value;
 	});
 </script>
@@ -33,7 +32,7 @@
 				<T.Mesh key={i + ',' + j + ',' + k} position={[i * cubeSize, j * cubeSize, k * cubeSize]}>
 					<T.LineSegments>
 						<T.EdgesGeometry args={[new BoxGeometry(cubeSize, cubeSize, cubeSize)]} />
-						<CubeStatus activated={boardState[i][j][k].activated} {innerCubeSize} />
+						<CubeStatus cell={boardState[i][j][k]} {innerCubeSize} />
 					</T.LineSegments>
 					<InnerCube
 						position={[

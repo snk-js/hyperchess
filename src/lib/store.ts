@@ -9,13 +9,18 @@ const BOARDSIZE = 8;
 export type PieceCoords = [number, number, number];
 
 export interface Cell {
-	piece: Piece;
+	piece?: Piece;
 	selected: boolean;
 	activated: boolean;
 	coords: PieceCoords;
 }
 
-export const dummyCell = { piece: '', selected: false, activated: false, coords: [0, 0, 0] };
+export const dummyCell: Cell = {
+	piece: '' as Piece,
+	selected: false,
+	activated: false,
+	coords: [0, 0, 0]
+};
 
 export type Board = Cell[][][];
 
