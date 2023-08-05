@@ -19,9 +19,6 @@
 	$: board.subscribe((value: Board) => {
 		boardState = value;
 	});
-
-	const sphereGeometry = new SphereGeometry(innerCubeSize, 32, 32);
-	const material = new MeshBasicMaterial({ color: '#FF0000', transparent: true, opacity: 0.5 });
 </script>
 
 <T.Mesh

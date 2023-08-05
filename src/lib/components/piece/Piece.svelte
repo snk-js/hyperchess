@@ -27,7 +27,6 @@
 
 	const selectCell = (status?: boolean) => {
 		board.update((value) => {
-			console.log(cell.coords);
 			const [x, y, z] = cell.coords;
 			if (value[x][y][z]) {
 				value[x][y][z].selected = status || !value[x][y][z].selected;
@@ -49,7 +48,6 @@
 	};
 
 	const handleClick = () => {
-		console.log('s');
 		selectCell();
 	};
 
