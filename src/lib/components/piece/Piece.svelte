@@ -6,8 +6,7 @@
 	import type { Cell, PieceCoords } from '$lib/store';
 	import { board } from '$lib/store';
 	import { get } from 'svelte/store';
-	import { ceilPowerOfTwo } from 'three/src/math/MathUtils';
-
+	import Pieces from './Pieces.svelte';
 	export const ref = new Group();
 	export let idx: PieceCoords = [0, 0, 0];
 	let cell: Cell;
@@ -28,6 +27,7 @@
 
 	const selectCell = (status?: boolean) => {
 		board.update((value) => {
+			console.log(cell.coords);
 			const [x, y, z] = cell.coords;
 			if (value[x][y][z]) {
 				value[x][y][z].selected = status || !value[x][y][z].selected;
@@ -49,11 +49,16 @@
 	};
 
 	const handleClick = () => {
+		console.log('s');
 		selectCell();
 	};
 
 	interactivity();
-	const gltf = useGltf('/src/lib/components/piece/scene-transformed.glb', { useDraco: true });
+	const gltf = useGltf('/src/lib/components/piece/scene-transformed.glb', {
+		useDraco: true,
+		useMeshopt: true
+	});
+
 	const component = forwardEventHandlers();
 </script>
 
@@ -61,18 +66,18 @@
 	{#await gltf}
 		<slot name="fallback" />
 	{:then gltf}
-		<T.Group position={[-0.75, 0, 0]} rotation={[-Math.PI / 2, 0, -Math.PI]}>
-			<T.Group position={[0, 0, 2]}>
-				<T.Mesh
+		<T.Group position={[-0.75, 0, 0]}>
+			<T.Group position={[0, 0, 0]}>
+				<T.Group
+					position={[0, 1.8, 0]}
+					scale={0.5}
 					on:pointerover={handlePointerOver}
 					on:pointerout={handleMouseLeave}
 					on:pointermissed={() => handleMouseLeave('deselect')}
 					on:click={handleClick}
-					geometry={gltf.nodes.WhiteQueen_0.geometry}
-					material={gltf.materials.Root}
-					position={[0, 0, 0]}
-					scale={0.1}
-				/>
+				>
+					<Pieces {gltf} side={cell.side} piece={cell.piece} />
+				</T.Group>
 			</T.Group>
 		</T.Group>
 	{:catch error}

@@ -4,12 +4,13 @@ import type { Writable } from 'svelte/store';
 export type Piece = 'queen' | 'king' | 'bishop' | 'knight' | 'rook' | 'pawn' | '';
 
 export const BOARDSIZE = 8;
-
+export type Side = 'white' | 'black' | '';
 // ----------------------->  x,      y,       z
 export type PieceCoords = [number, number, number];
 
 export interface Cell {
 	piece?: Piece;
+	side: Side;
 	selected: boolean;
 	activated: boolean;
 	coords: PieceCoords;
@@ -21,7 +22,8 @@ export const dummyCell: Cell = {
 	selected: false,
 	activated: false,
 	coords: [0, 0, 0],
-	highlighted: false
+	highlighted: false,
+	side: ''
 };
 
 export type Board = Cell[][][];
@@ -38,7 +40,8 @@ function createEmptyBoard(size = BOARDSIZE): Board {
 					selected: false,
 					activated: false,
 					coords: [i, j, k],
-					highlighted: false
+					highlighted: false,
+					side: ''
 				};
 			}
 		}
@@ -49,6 +52,7 @@ function createEmptyBoard(size = BOARDSIZE): Board {
 const initialBoard: Board = createEmptyBoard(BOARDSIZE);
 initialBoard[3][3][3] = {
 	...initialBoard[3][3][3],
+	side: 'white',
 	piece: 'queen',
 	selected: false,
 	activated: false,

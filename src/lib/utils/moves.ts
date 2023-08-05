@@ -67,3 +67,16 @@ export const genPawnFirstMoves = (position: PieceCoords) => {
 	const moves = pieces.limited.pawn.first;
 	return getMovesByPosition(moves, position);
 };
+
+export const genMoves = {
+	queen: genQueenMoves,
+	rook: genRookMoves,
+	bishop: genBishopMoves,
+	king: genKingMoves,
+	knight: genKnightMoves,
+	pawn: {
+		moves: genPawnMoves,
+		attacks: genPawnAttacks,
+		first: genPawnFirstMoves
+	}
+};
