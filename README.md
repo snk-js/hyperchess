@@ -1,8 +1,7 @@
+![localhost_5173 (1)](https://github.com/snk-js/hyperchess/assets/34718184/9a8d7a59-d016-4e50-97af-d1b4636a9438)
 
-
-https://github.com/snk-js/hyperchess/assets/34718184/c7e7333a-2633-49e7-b4ee-79b1d551a73f
-
-
+# to run
+`yarn run dev -- --open`
 
 # create-svelte
 
