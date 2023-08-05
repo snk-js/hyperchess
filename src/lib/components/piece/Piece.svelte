@@ -25,11 +25,11 @@
 		});
 	};
 
-	const selectCell = () => {
+	const selectCell = (status?: boolean) => {
 		board.update((value) => {
 			const [x, y, z] = coords;
 			if (value[x][y][z]) {
-				value[x][y][z].selected = !value[x][y][z].selected;
+				value[x][y][z].selected = status || !value[x][y][z].selected;
 			}
 			return value;
 		});
@@ -39,7 +39,10 @@
 		updateCell(true);
 	};
 
-	const handleMouseLeave = () => {
+	const handleMouseLeave = (status: string) => {
+		if (status === 'deselect') {
+			selectCell(false);
+		}
 		updateCell(false);
 	};
 
@@ -61,6 +64,7 @@
 				<T.Mesh
 					on:pointerover={handlePointerOver}
 					on:pointerout={handleMouseLeave}
+					on:pointermissed={() => handleMouseLeave('deselect')}
 					on:click={handleClick}
 					geometry={gltf.nodes.WhiteQueen_0.geometry}
 					material={gltf.materials.Root}

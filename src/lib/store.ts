@@ -51,7 +51,8 @@ initialBoard[3][3][3] = {
 	...initialBoard[3][3][3],
 	piece: 'queen',
 	selected: false,
-	activated: false
+	activated: false,
+	highlighted: false
 };
 
 export const board: Writable<Board> = writable(initialBoard);

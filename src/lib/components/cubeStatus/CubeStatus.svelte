@@ -6,11 +6,13 @@
 
 	import { tweened } from 'svelte/motion';
 	import { backInOut } from 'svelte/easing';
-
-	import { updateBox } from './boxState';
+	// import { highlightMoves } from './highlightMoves';
+	import { updateBox } from './cellStyles';
 
 	export let cell: Cell = dummyCell;
 	export let innerCubeSize: number;
+
+	const hasHighlighted = false;
 
 	const scale = tweened(0, {
 		duration: 200,
@@ -18,10 +20,18 @@
 	});
 
 	$: {
-		if (cell.activated) {
+		if (cell.activated || cell.selected) {
 			scale.set(4);
 		} else {
 			scale.set(0);
+		}
+
+		if (cell.activated && !hasHighlighted) {
+			// highlightMoves(cell);
+		}
+
+		if (!cell.activated && hasHighlighted) {
+			// highlightMoves();
 		}
 	}
 
