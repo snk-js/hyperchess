@@ -3,21 +3,22 @@
 	import { T, forwardEventHandlers } from '@threlte/core';
 	import { useGltf } from '@threlte/extras';
 	import { interactivity } from '@threlte/extras';
-	import type { PieceCoords } from '$lib/store';
+	import type { Cell, PieceCoords } from '$lib/store';
 	import { board } from '$lib/store';
 	import { get } from 'svelte/store';
+	import { ceilPowerOfTwo } from 'three/src/math/MathUtils';
 
 	export const ref = new Group();
 	export let idx: PieceCoords = [0, 0, 0];
-	let coords: PieceCoords;
+	let cell: Cell;
 
 	$: {
-		const cell = get(board)[idx[0]][idx[1]][idx[2]];
-		coords = cell.coords;
+		const newcell = get(board)[idx[0]][idx[1]][idx[2]];
+		cell = newcell;
 	}
 	const updateCell = (activated: boolean) => {
 		board.update((value) => {
-			const [x, y, z] = coords;
+			const [x, y, z] = cell.coords;
 			if (value[x][y][z]) {
 				value[x][y][z].activated = activated;
 			}
@@ -27,7 +28,7 @@
 
 	const selectCell = (status?: boolean) => {
 		board.update((value) => {
-			const [x, y, z] = coords;
+			const [x, y, z] = cell.coords;
 			if (value[x][y][z]) {
 				value[x][y][z].selected = status || !value[x][y][z].selected;
 			}
@@ -41,6 +42,7 @@
 
 	const handleMouseLeave = (status: string) => {
 		if (status === 'deselect') {
+			if (!cell.selected) return;
 			selectCell(false);
 		}
 		updateCell(false);

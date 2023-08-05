@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { T } from '@threlte/core';
-	import { BoxGeometry, Mesh, MeshBasicMaterial, SphereGeometry } from 'three';
+	import { BoxGeometry, MeshBasicMaterial, SphereGeometry } from 'three';
 	import InnerCube from '../innerCube/innerCube.svelte';
 	import { board } from '$lib/store';
 	import type { Board } from '$lib/store';
@@ -21,8 +21,7 @@
 	});
 
 	const sphereGeometry = new SphereGeometry(innerCubeSize, 32, 32);
-	const boxGeometry = new BoxGeometry(totalSize, totalSize, totalSize);
-	const material = new MeshBasicMaterial({ color: '#FF0000', transparent: true, opacity: 0 });
+	const material = new MeshBasicMaterial({ color: '#FF0000', transparent: true, opacity: 0.5 });
 </script>
 
 <T.Mesh
@@ -36,8 +35,12 @@
 			{#each Array(cubesPerDimension) as _, k}
 				<T.Mesh key={i + ',' + j + ',' + k} position={[i * cubeSize, j * cubeSize, k * cubeSize]}>
 					<!-- Create a red shining floating ball at the specified coordinates -->
-					{#if i === 0 && j === 0 && (k === 0 || k === 1)}
-						<T.Mesh geometry={sphereGeometry} {material} position={[i, j, k]} />
+					{#if i === 3 && j === 2 && k === 3}
+						<T.Mesh
+							geometry={sphereGeometry}
+							{material}
+							position={[i * innerCubeSize - 0.3, j * innerCubeSize - 0.3, k * innerCubeSize - 0.3]}
+						/>
 					{/if}
 
 					<T.LineSegments>

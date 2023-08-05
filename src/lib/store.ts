@@ -3,7 +3,7 @@ import type { Writable } from 'svelte/store';
 
 export type Piece = 'queen' | 'king' | 'bishop' | 'knight' | 'rook' | 'pawn' | '';
 
-const BOARDSIZE = 8;
+export const BOARDSIZE = 8;
 
 // ----------------------->  x,      y,       z
 export type PieceCoords = [number, number, number];
