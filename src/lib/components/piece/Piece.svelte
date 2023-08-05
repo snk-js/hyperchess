@@ -76,7 +76,9 @@
 					on:pointermissed={() => handleMouseLeave('deselect')}
 					on:click={handleClick}
 				>
-					<Pieces {gltf} side={cell.side} piece={cell.piece} />
+					{#if cell.piece}
+						<Pieces {gltf} side={cell.side} piece={cell.piece} />
+					{/if}
 				</T.Group>
 			</T.Group>
 		</T.Group>

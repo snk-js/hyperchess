@@ -4,7 +4,12 @@
 	import Cube from './cube/Cube.svelte';
 </script>
 
-<T.PerspectiveCamera makeDefault position={[-10, 10, 10]} fov={15}>
+<T.PerspectiveCamera
+	camera={{ background: 'bgTexture' }}
+	makeDefault
+	position={[-10, 10, 10]}
+	fov={15}
+>
 	<OrbitControls autoRotate enableZoom={true} enableDamping autoRotateSpeed={0.5} target.y={1.5} />
 </T.PerspectiveCamera>
 

@@ -34,15 +34,6 @@
 		{#each Array(cubesPerDimension) as _, j}
 			{#each Array(cubesPerDimension) as _, k}
 				<T.Mesh key={i + ',' + j + ',' + k} position={[i * cubeSize, j * cubeSize, k * cubeSize]}>
-					<!-- Create a red shining floating ball at the specified coordinates -->
-					{#if i === 3 && j === 2 && k === 3}
-						<T.Mesh
-							geometry={sphereGeometry}
-							{material}
-							position={[i * innerCubeSize - 0.3, j * innerCubeSize - 0.3, k * innerCubeSize - 0.3]}
-						/>
-					{/if}
-
 					<T.LineSegments>
 						<T.EdgesGeometry args={[new BoxGeometry(cubeSize, cubeSize, cubeSize)]} />
 						<CubeStatus cell={boardState[i][j][k]} {innerCubeSize} />

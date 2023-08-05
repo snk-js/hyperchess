@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { ThrelteGltf } from '@threlte/extras';
 	import WhiteQueen from './pieceClasses/WhiteQueen.svelte';
-	import WhiteKing from './pieceClasses/BlackKing.svelte';
+	import WhiteKing from './pieceClasses/WhiteKing.svelte';
 	import WhiteKnight from './pieceClasses/WhiteKnight.svelte';
 	import WhitePawn from './pieceClasses/WhitePawn.svelte';
 	import WhiteRook from './pieceClasses/WhiteRook.svelte';

@@ -49,14 +49,40 @@ function createEmptyBoard(size = BOARDSIZE): Board {
 	return board;
 }
 
-const initialBoard: Board = createEmptyBoard(BOARDSIZE);
-initialBoard[3][3][3] = {
-	...initialBoard[3][3][3],
-	side: 'white',
-	piece: 'queen',
-	selected: false,
-	activated: false,
-	highlighted: false
+type PieceConfig = {
+	side: Side;
+	piece: Piece;
+	coords: PieceCoords;
 };
+
+const putPieces: PieceConfig[] = [
+	{ side: 'white', piece: 'queen', coords: [3, 0, 3] },
+	{ side: 'white', piece: 'bishop', coords: [3, 0, 4] },
+	{ side: 'white', piece: 'king', coords: [4, 0, 4] },
+	{ side: 'white', piece: 'bishop', coords: [4, 0, 3] },
+	{ side: 'white', piece: 'rook', coords: [2, 0, 2] },
+	{ side: 'white', piece: 'rook', coords: [5, 0, 5] },
+	{ side: 'white', piece: 'knight', coords: [5, 0, 2] },
+	{ side: 'white', piece: 'knight', coords: [2, 0, 5] },
+	{ side: 'white', piece: 'pawn', coords: [3, 1, 3] },
+	{ side: 'white', piece: 'pawn', coords: [3, 1, 4] },
+	{ side: 'white', piece: 'pawn', coords: [4, 1, 4] },
+	{ side: 'white', piece: 'pawn', coords: [4, 1, 3] },
+	{ side: 'white', piece: 'pawn', coords: [2, 1, 2] },
+	{ side: 'white', piece: 'pawn', coords: [5, 1, 5] },
+	{ side: 'white', piece: 'pawn', coords: [5, 1, 2] },
+	{ side: 'white', piece: 'pawn', coords: [2, 1, 5] }
+];
+
+const initialBoard: Board = createEmptyBoard(BOARDSIZE);
+
+putPieces.forEach((pieceInfo) => {
+	const [x, y, z] = pieceInfo.coords;
+	initialBoard[x][y][z] = {
+		...initialBoard[x][y][z],
+		side: pieceInfo.side,
+		piece: pieceInfo.piece
+	};
+});
 
 export const board: Writable<Board> = writable(initialBoard);

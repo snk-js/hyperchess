@@ -12,4 +12,8 @@
 	}
 </script>
 
-<T.Mesh geometry={gltf.nodes.Object_10.geometry} material={gltf.materials['Material.003']} />
+<T.Mesh
+	scale={0.8}
+	geometry={gltf.nodes.Object_10.geometry}
+	material={gltf.materials['Material.003']}
+/>
