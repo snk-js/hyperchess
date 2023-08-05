@@ -2,8 +2,8 @@
 <script lang="ts">
 	import { T } from '@threlte/core';
 	import { dummyCell } from '$lib/store';
-	import type { Cell } from '$lib/store';
-
+	import type { Cell, PieceCoords } from '$lib/store';
+	import { hightLightCells } from '$lib/utils/hightlight';
 	import { tweened } from 'svelte/motion';
 	import { backInOut } from 'svelte/easing';
 	// import { highlightMoves } from './highlightMoves';
@@ -12,26 +12,16 @@
 	export let cell: Cell = dummyCell;
 	export let innerCubeSize: number;
 
-	const hasHighlighted = false;
-
 	const scale = tweened(0, {
 		duration: 200,
 		easing: backInOut
 	});
 
 	$: {
-		if (cell.activated || cell.selected) {
+		if (cell.activated || cell.selected || cell.highlighted) {
 			scale.set(4);
 		} else {
 			scale.set(0);
-		}
-
-		if (cell.activated && !hasHighlighted) {
-			// highlightMoves(cell);
-		}
-
-		if (!cell.activated && hasHighlighted) {
-			// highlightMoves();
 		}
 	}
 

@@ -9,7 +9,7 @@ export type Side = 'white' | 'black' | '';
 export type PieceCoords = [number, number, number];
 
 export interface Cell {
-	piece?: Piece;
+	piece: Piece;
 	side: Side;
 	selected: boolean;
 	activated: boolean;

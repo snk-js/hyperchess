@@ -24,7 +24,7 @@ function getMovesByPosition(moves: Delta[], position: PieceCoords): PieceCoords[
 	});
 }
 
-function isWithinBounds(x: number, y: number, z: number) {
+export function isWithinBounds(x: number, y: number, z: number) {
 	return x >= 0 && x < BOARDSIZE && y >= 0 && y < BOARDSIZE && z >= 0 && z < BOARDSIZE;
 }
 
