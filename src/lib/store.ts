@@ -71,7 +71,24 @@ const putPieces: PieceConfig[] = [
 	{ side: 'white', piece: 'pawn', coords: [2, 1, 2] },
 	{ side: 'white', piece: 'pawn', coords: [5, 1, 5] },
 	{ side: 'white', piece: 'pawn', coords: [5, 1, 2] },
-	{ side: 'white', piece: 'pawn', coords: [2, 1, 5] }
+	{ side: 'white', piece: 'pawn', coords: [2, 1, 5] },
+
+	{ side: 'black', piece: 'queen', coords: [3, 7, 3] },
+	{ side: 'black', piece: 'bishop', coords: [3, 7, 4] },
+	{ side: 'black', piece: 'king', coords: [4, 7, 4] },
+	{ side: 'black', piece: 'bishop', coords: [4, 7, 3] },
+	{ side: 'black', piece: 'rook', coords: [2, 7, 2] },
+	{ side: 'black', piece: 'rook', coords: [5, 7, 5] },
+	{ side: 'black', piece: 'knight', coords: [5, 7, 2] },
+	{ side: 'black', piece: 'knight', coords: [2, 7, 5] },
+	{ side: 'black', piece: 'pawn', coords: [3, 6, 3] },
+	{ side: 'black', piece: 'pawn', coords: [3, 6, 4] },
+	{ side: 'black', piece: 'pawn', coords: [4, 6, 4] },
+	{ side: 'black', piece: 'pawn', coords: [4, 6, 3] },
+	{ side: 'black', piece: 'pawn', coords: [2, 6, 2] },
+	{ side: 'black', piece: 'pawn', coords: [5, 6, 5] },
+	{ side: 'black', piece: 'pawn', coords: [5, 6, 2] },
+	{ side: 'black', piece: 'pawn', coords: [2, 6, 5] }
 ];
 
 const initialBoard: Board = createEmptyBoard(BOARDSIZE);
