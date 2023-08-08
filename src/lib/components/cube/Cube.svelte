@@ -2,10 +2,12 @@
 	import { T } from '@threlte/core';
 	import { BoxGeometry, MeshBasicMaterial, SphereGeometry } from 'three';
 	import InnerCube from '../innerCube/innerCube.svelte';
-	import { board } from '$lib/store';
+	import { board, offsetY } from '$lib/store';
 	import type { Board } from '$lib/store';
 	import CubeStatus from '../cubeStatus/CubeStatus.svelte';
 	import GridDivider from '../gridDivider/GridDivider.svelte';
+	import { tweened } from 'svelte/motion';
+	import { backInOut } from 'svelte/easing';
 
 	const cubesPerDimension = 8;
 	const totalSize = 3;
@@ -13,6 +15,15 @@
 	const centralizedSize = 1 + (1 - cubeSize) / 2;
 	const innerCubeSize = cubeSize / 4;
 	const multiplier = 25;
+
+	const offsetYState = tweened(0, {
+		duration: 200,
+		easing: backInOut
+	});
+
+	$: {
+		offsetYState.set($offsetY);
+	}
 
 	let boardState: Board;
 
@@ -22,7 +33,7 @@
 </script>
 
 <T.Mesh
-	position.y={cubeSize - cubeSize * 0.2}
+	position.y={(cubeSize - cubeSize * 0.2) * $offsetYState}
 	position.z={-centralizedSize}
 	position.x={-centralizedSize}
 >

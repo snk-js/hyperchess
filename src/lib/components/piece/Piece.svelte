@@ -7,7 +7,6 @@
 	import { board, dummyCell } from '$lib/store';
 	import { get } from 'svelte/store';
 	import Pieces from './Pieces.svelte';
-	import { hightLightCells } from '$lib/utils/hightlight';
 	import { genMoves, isWithinBounds } from '$lib/utils/moves';
 
 	export const ref = new Group();
@@ -69,7 +68,7 @@
 
 					if (cell.piece) {
 						if (cell.piece === 'pawn') {
-							cubes = genMoves['pawn'].moves(cell.coords);
+							cubes = genMoves['pawn'](cell.side).moves(cell.coords);
 						} else {
 							cubes = genMoves[cell.piece](cell.coords);
 						}
@@ -117,7 +116,8 @@
 		<T.Group position={[-0.75, 0, 0]}>
 			<T.Group position={[0, 0, 0]}>
 				<T.Group
-					position={[0, 1.8, 0]}
+					rotation={(cell.side === 'black' && [0, 0, 3.15]) || [0, 0, 0]}
+					position={cell.side === 'black' ? [0, 5.5, 0] : [0, 1.8, 0]}
 					scale={0.5}
 					on:pointerover={handlePointerOver}
 					on:pointerout={handleMouseLeave}

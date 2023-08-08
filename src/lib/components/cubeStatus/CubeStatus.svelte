@@ -3,7 +3,6 @@
 	import { T } from '@threlte/core';
 	import { dummyCell } from '$lib/store';
 	import type { Cell, PieceCoords } from '$lib/store';
-	import { hightLightCells } from '$lib/utils/hightlight';
 	import { tweened } from 'svelte/motion';
 	import { backInOut } from 'svelte/easing';
 	// import { highlightMoves } from './highlightMoves';

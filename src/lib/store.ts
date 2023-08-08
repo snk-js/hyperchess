@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 
 export type Piece = 'queen' | 'king' | 'bishop' | 'knight' | 'rook' | 'pawn' | '';
@@ -92,6 +92,18 @@ const putPieces: PieceConfig[] = [
 ];
 
 const initialBoard: Board = createEmptyBoard(BOARDSIZE);
+
+export const offsetY = writable(0);
+
+export const increaseOffsetY = () => {
+	if (get(offsetY) > 3) return;
+	offsetY.update((val) => val + 1);
+};
+
+export const decreaseOffsetY = () => {
+	if (get(offsetY) < -3) return;
+	offsetY.update((val) => val - 1);
+};
 
 putPieces.forEach((pieceInfo) => {
 	const [x, y, z] = pieceInfo.coords;

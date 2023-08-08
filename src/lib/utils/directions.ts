@@ -1,3 +1,5 @@
+import type { Side } from '$lib/store';
+
 const VERTICALS = {
 	UP: [0, 1, 0],
 	DOWN: [0, -1, 0]
@@ -90,6 +92,38 @@ const KNIGHT_MOVES = [
 	[2, -1, -1]
 ];
 
+const whitePawnMoves = {
+	first: [
+		[0, 2, 0],
+		[-2, 0, 0],
+		[2, 0, 0],
+		[0, 0, 2],
+		[0, 0, -2]
+	],
+	moves: [VERTICALS.UP, ...Object.values(HORIZONTALS)],
+	attack: [
+		...Object.values(HORIZONTAL_DIAGONALS),
+		...Object.values(UP_DIAGONAL_DIAGONALS),
+		...Object.values(UP_PERPENDICULAR_DIAGONALS)
+	]
+};
+
+const blackPawnMoves = {
+	first: [
+		[0, -2, 0],
+		[-2, 0, 0],
+		[2, 0, 0],
+		[0, 0, 2],
+		[0, 0, -2]
+	],
+	moves: [VERTICALS.DOWN, ...Object.values(HORIZONTALS)],
+	attack: [
+		...Object.values(HORIZONTAL_DIAGONALS),
+		...Object.values(DOWN_DIAGONAL_DIAGONALS),
+		...Object.values(DOWN_PERPENDICULAR_DIAGONALS)
+	]
+};
+
 export const pieces = {
 	unlimited: {
 		queen: Object.values(DELTAS),
@@ -99,20 +133,8 @@ export const pieces = {
 	limited: {
 		king: Object.values(DELTAS),
 		knight: KNIGHT_MOVES,
-		pawn: {
-			first: [
-				[0, 2, 0],
-				[-2, 0, 0],
-				[2, 0, 0],
-				[0, 0, 2],
-				[0, 0, -2]
-			],
-			moves: [VERTICALS.UP, ...Object.values(HORIZONTALS)],
-			attack: [
-				...Object.values(HORIZONTAL_DIAGONALS),
-				...Object.values(UP_DIAGONAL_DIAGONALS),
-				...Object.values(UP_PERPENDICULAR_DIAGONALS)
-			]
+		pawn: (side: Side) => {
+			return side === 'white' ? whitePawnMoves : blackPawnMoves;
 		}
 	}
 };

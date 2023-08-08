@@ -1,4 +1,5 @@
-import { BOARDSIZE, type PieceCoords } from '$lib/store';
+import type Pieces from '$lib/components/piece/Pieces.svelte';
+import { BOARDSIZE, type PieceCoords, type Side } from '$lib/store';
 import type { Delta } from './directions';
 import { pieces } from './directions';
 
@@ -53,18 +54,18 @@ export const genKnightMoves = (position: PieceCoords) => {
 	return getMovesByPosition(moves, position);
 };
 
-export const genPawnMoves = (position: PieceCoords) => {
-	const moves = pieces.limited.pawn.moves;
+export const genPawnMoves = (position: PieceCoords, side: Side) => {
+	const moves = pieces.limited.pawn(side).moves;
 	return getMovesByPosition(moves, position);
 };
 
-export const genPawnAttacks = (position: PieceCoords) => {
-	const moves = pieces.limited.pawn.attack;
+export const genPawnAttacks = (position: PieceCoords, side: Side) => {
+	const moves = pieces.limited.pawn(side).attack;
 	return getMovesByPosition(moves, position);
 };
 
-export const genPawnFirstMoves = (position: PieceCoords) => {
-	const moves = pieces.limited.pawn.first;
+export const genPawnFirstMoves = (position: PieceCoords, side: Side) => {
+	const moves = pieces.limited.pawn(side).first;
 	return getMovesByPosition(moves, position);
 };
 
@@ -74,9 +75,9 @@ export const genMoves = {
 	bishop: genBishopMoves,
 	king: genKingMoves,
 	knight: genKnightMoves,
-	pawn: {
-		moves: genPawnMoves,
-		attacks: genPawnAttacks,
-		first: genPawnFirstMoves
-	}
+	pawn: (side: Side) => ({
+		moves: (position: PieceCoords) => genPawnMoves(position, side),
+		attacks: (position: PieceCoords) => genPawnAttacks(position, side),
+		first: (position: PieceCoords) => genPawnFirstMoves(position, side)
+	})
 };
