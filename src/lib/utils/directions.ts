@@ -105,7 +105,7 @@ const whitePawnMoves = {
 		[0, 0, 2],
 		[0, 0, -2]
 	],
-	moves: [VERTICALS.UP, ...Object.values(HORIZONTALS)],
+	moves: [VERTICALS.UP],
 	attack: [
 		...Object.values(HORIZONTAL_DIAGONALS),
 		...Object.values(UP_DIAGONAL_DIAGONALS),
@@ -133,7 +133,7 @@ export const pieces = {
 	unlimited: {
 		queen: Object.values(DELTAS),
 		rook: Object.values(VERTICALS).concat(Object.values(HORIZONTALS)),
-		bishop: Object.values(PERPENDICULAR_DIAGONALS)
+		bishop: Object.values(DIAGONAL_DIAGONALS)
 	},
 	limited: {
 		king: Object.values(DELTAS),
