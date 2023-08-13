@@ -1,4 +1,3 @@
-import type Pieces from '$lib/components/piece/Pieces.svelte';
 import { BOARDSIZE, type PieceCoords, type Side } from '$lib/store';
 import type { Delta } from './directions';
 import { pieces } from './directions';

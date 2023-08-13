@@ -12,7 +12,7 @@
 	import BlackPawn from './pieceClasses/BlackPawn.svelte';
 	import BlackRook from './pieceClasses/BlackRook.svelte';
 	import BlackBishop from './pieceClasses/BlackBishop.svelte';
-	import type { Piece, Side } from '$lib/store';
+	import type { Piece, Side } from '$lib/store/index';
 
 	export let gltf: ThrelteGltf<{
 		nodes: Record<string, any>;

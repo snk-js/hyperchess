@@ -1,8 +1,8 @@
 <!-- CubeStatus.svelte -->
 <script lang="ts">
 	import { T } from '@threlte/core';
-	import { dummyCell } from '$lib/store';
-	import type { Cell, PieceCoords } from '$lib/store';
+	import { dummyCell } from '$lib/store/';
+	import type { Cell, PieceCoords } from '$lib/store/';
 	import { tweened } from 'svelte/motion';
 	import { backInOut } from 'svelte/easing';
 	// import { highlightMoves } from './highlightMoves';

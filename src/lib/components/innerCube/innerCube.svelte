@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { PieceCoords } from '$lib/store';
+	import type { PieceCoords } from '$lib/store/';
 	import { T } from '@threlte/core';
 	import Piece from '../piece/Piece.svelte';
-	import { board } from '$lib/store';
+	import { board } from '$lib/store/';
 	import { get } from 'svelte/store';
 
 	export let position: [number, number, number] = [0, 0, 0];

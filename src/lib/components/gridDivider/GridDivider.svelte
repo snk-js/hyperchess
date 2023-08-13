@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { PieceCoords } from '$lib/store';
+	import type { PieceCoords } from '$lib/store/';
 	import { T } from '@threlte/core';
 	import { BufferAttribute, BufferGeometry, LineBasicMaterial } from 'three';
 

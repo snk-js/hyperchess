@@ -2,7 +2,8 @@
 	import { T } from '@threlte/core';
 	import { BoxGeometry, MeshBasicMaterial, SphereGeometry } from 'three';
 	import InnerCube from '../innerCube/innerCube.svelte';
-	import { board, offsetY } from '$lib/store';
+	import { board } from '$lib/store';
+	import { offsetY } from '$lib/store/camera';
 	import type { Board } from '$lib/store';
 	import CubeStatus from '../cubeStatus/CubeStatus.svelte';
 	import GridDivider from '../gridDivider/GridDivider.svelte';
