@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { T } from '@threlte/core';
-	import { ContactShadows, OrbitControls } from '@threlte/extras';
+	import { OrbitControls } from '@threlte/extras';
 	import Cube from './cube/Cube.svelte';
 </script>
 

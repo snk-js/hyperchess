@@ -5,7 +5,7 @@
 	import { interactivity } from '@threlte/extras';
 	import type { Cell, PieceCoords } from '$lib/store/';
 	import { board, clear, dummyCell } from '$lib/store/';
-	import { updateCellStatus, updatedCells } from '$lib/store/cellStates';
+	import { updateCellStatus } from '$lib/store/cellStates';
 	import { get } from 'svelte/store';
 	import Pieces from './Pieces.svelte';
 
@@ -27,15 +27,11 @@
 	const component = forwardEventHandlers();
 
 	const handlePointerOver = () => {
-		if (cell.piece) {
-			updateCellStatus([cell.coords], 'activated', true);
-		}
+		updateCellStatus([cell.coords], 'activated', true);
 	};
 
 	const handleMouseLeave = () => {
-		if (cell.piece) {
-			updateCellStatus([cell.coords], 'activated', false);
-		}
+		updateCellStatus([cell.coords], 'activated', false);
 	};
 
 	const handleClick = () => {

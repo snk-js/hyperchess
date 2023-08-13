@@ -1,14 +1,13 @@
 <script lang="ts">
 	import { T } from '@threlte/core';
-	import { BoxGeometry, MeshBasicMaterial, SphereGeometry } from 'three';
-	import InnerCube from '../innerCube/innerCube.svelte';
+	import { BoxGeometry } from 'three';
 	import { board } from '$lib/store';
 	import { offsetY } from '$lib/store/camera';
 	import type { Board } from '$lib/store';
-	import CubeStatus from '../cubeStatus/CubeStatus.svelte';
 	import GridDivider from '../gridDivider/GridDivider.svelte';
 	import { tweened } from 'svelte/motion';
 	import { backInOut } from 'svelte/easing';
+	import InnerMash from '../innerCube/innerMash.svelte';
 
 	const cubesPerDimension = 8;
 	const totalSize = 3;
@@ -42,20 +41,7 @@
 	{#each Array(cubesPerDimension) as _, i}
 		{#each Array(cubesPerDimension) as _, j}
 			{#each Array(cubesPerDimension) as _, k}
-				<T.Mesh key={i + ',' + j + ',' + k} position={[i * cubeSize, j * cubeSize, k * cubeSize]}>
-					<T.LineSegments>
-						<T.EdgesGeometry args={[new BoxGeometry(cubeSize, cubeSize, cubeSize)]} />
-						<CubeStatus cell={boardState[i][j][k]} {innerCubeSize} />
-					</T.LineSegments>
-					<InnerCube
-						position={[
-							(i * cubeSize) / multiplier,
-							(j * cubeSize) / multiplier,
-							(k * cubeSize) / multiplier
-						]}
-						idx={[i, j, k]}
-					/>
-				</T.Mesh>
+				<InnerMash {i} {j} {k} {cubeSize} {innerCubeSize} cell={boardState[i][j][k]} />
 			{/each}
 		{/each}
 	{/each}
