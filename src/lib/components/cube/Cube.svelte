@@ -14,7 +14,6 @@
 	const cubeSize = totalSize / cubesPerDimension;
 	const centralizedSize = 1 + (1 - cubeSize) / 2;
 	const innerCubeSize = cubeSize / 4;
-	const multiplier = 25;
 
 	const offsetYState = tweened(0, {
 		duration: 200,
