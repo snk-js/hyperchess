@@ -1,4 +1,5 @@
-![localhost_5173 (1)](https://github.com/snk-js/hyperchess/assets/34718184/9a8d7a59-d016-4e50-97af-d1b4636a9438)
+
+[Tab-1692220322371.webm](https://github.com/snk-js/hyperchess/assets/34718184/659b38cd-1cef-4ce7-a658-e21abe3f542b)
 
 # to run
 `yarn run dev -- --open`
