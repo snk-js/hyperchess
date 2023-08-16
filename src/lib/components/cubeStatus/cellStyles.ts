@@ -9,32 +9,36 @@ const mesh: MeshBasicMaterialParameters[] = [
 	{ color: 0x88ff09 },
 	{ color: 0x1afa92 },
 	{ color: 0x88ff09 },
-	defaultBox
+	defaultBox,
+	{ color: 0xffe342 }
 ];
 
 const inner: MeshBasicMaterialParameters[] = [
 	{ color: 0xff177f, opacity: 0.2, transparent: true },
 	{ color: 0x1afa92, opacity: 0.2, transparent: true },
 	{ color: 0x88ff09, opacity: 0.05, transparent: true },
-	defaultBox
+	defaultBox,
+	{ color: 0xffe342, opacity: 0.2, transparent: true }
 ];
 
-const states = ['activated', 'selected', 'highlighted', 'default'];
+const states = ['activated', 'selected', 'highlighted', 'default', 'onAvailableMove'];
 
-const createMesh = (meshState: MeshStates = 'default') => {
-	const index = states.indexOf(meshState);
+const createMesh = (meshState: MeshStates = 'default', onAvailableMove?: boolean) => {
+	let index = states.indexOf(meshState);
+	onAvailableMove && (index = 4);
 	return { mesh: mesh[index], inner: inner[index] };
 };
 
 export const defaultMesh = createMesh();
 export const activated = createMesh('activated');
 export const selected = createMesh('selected');
-export const highlighted = createMesh('highlighted');
+export const highlighted = (onAvailableMove?: boolean) =>
+	createMesh('highlighted', onAvailableMove);
 
-export function updateBox(cell: Cell) {
+export function updateBox(cell: Cell, onAvailabldeMove?: boolean) {
 	switch (true) {
 		case cell.highlighted:
-			return highlighted;
+			return highlighted(onAvailabldeMove);
 		case cell.selected:
 			return selected;
 		case cell.activated:

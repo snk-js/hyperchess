@@ -25,6 +25,7 @@
 		<T.EdgesGeometry args={[new BoxGeometry(cubeSize, cubeSize, cubeSize)]} />
 		<CubeStatus {cell} {innerCubeSize} />
 	</T.LineSegments>
+
 	<InnerCube
 		position={[
 			(i * cubeSize) / multiplier,

@@ -1,5 +1,5 @@
 import { genMoves } from '$lib/utils/moves';
-import { updateCells, type PieceCoords, type CellStates, board, type Cell, updateCell } from '.';
+import { updateCells, type PieceCoords, type CellStates, board } from '.';
 import { get, writable } from 'svelte/store';
 
 export type UpdatedCell = {
@@ -38,6 +38,7 @@ export const updateCellStatus = (coords: PieceCoords[], cellState: CellStates, s
 					highlighted.map((cell) => cell.coord)
 				);
 			}
+
 			return [
 				...highlightedCells.map((coord) => ({ coord, highlighted: true })),
 				{ coord: cell.coords, selected: true }

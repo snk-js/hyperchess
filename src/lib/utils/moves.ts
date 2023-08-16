@@ -1,27 +1,43 @@
-import { BOARDSIZE, type PieceCoords, type Side } from '$lib/store';
+import { BOARDSIZE, type Piece, type PieceCoords, type Side } from '$lib/store';
 import type { Delta } from './directions';
 import { pieces } from './directions';
+import { board } from '$lib/store';
+import { get } from 'svelte/store';
 
 function expandMovesByPosition(moves: Delta[], position: PieceCoords): PieceCoords[] {
 	const expanded: PieceCoords[] = [];
-	for (const [dx, dy, dz] of moves) {
+	move: for (const [dx, dy, dz] of moves) {
+		let i = 0;
 		let x = position[0];
 		let y = position[1];
 		let z = position[2];
+
 		while (isWithinBounds(x, y, z)) {
+			const hasPiece = get(board)[x][y][z].piece;
+			if (hasPiece && i > 0) {
+				continue move;
+			}
 			expanded.push([x, y, z]);
 			x += dx;
 			y += dy;
 			z += dz;
+			i++;
 		}
 	}
 	return expanded;
 }
 
-function getMovesByPosition(moves: Delta[], position: PieceCoords): PieceCoords[] {
-	return moves.map(([dx, dy, dz]) => {
-		return [position[0] + dx, position[1] + dy, position[2] + dz];
-	});
+function getMovesByPosition(moves: PieceCoords[], position: PieceCoords): PieceCoords[] {
+	const boardPieces = get(board);
+	return moves
+		.map(([dx, dy, dz]) => {
+			return [position[0] + dx, position[1] + dy, position[2] + dz];
+		})
+		.filter((move) => {
+			return (
+				isWithinBounds(move[0], move[1], move[2]) && !boardPieces[move[0]][move[1]][move[2]].piece
+			);
+		});
 }
 
 export function isWithinBounds(x: number, y: number, z: number) {
@@ -54,7 +70,7 @@ export const genKnightMoves = (position: PieceCoords) => {
 };
 
 export const genPawnMoves = (position: PieceCoords, side: Side) => {
-	const moves = pieces.limited.pawn(side).moves;
+	const { moves } = pieces.limited.pawn(side);
 	return getMovesByPosition(moves, position);
 };
 

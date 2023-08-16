@@ -98,13 +98,7 @@ const KNIGHT_MOVES = [
 ];
 
 const whitePawnMoves = {
-	first: [
-		[0, 2, 0],
-		[-2, 0, 0],
-		[2, 0, 0],
-		[0, 0, 2],
-		[0, 0, -2]
-	],
+	first: [[0, 2, 0]],
 	moves: [VERTICALS.UP],
 	attack: [
 		...Object.values(HORIZONTAL_DIAGONALS),
@@ -114,14 +108,8 @@ const whitePawnMoves = {
 };
 
 const blackPawnMoves = {
-	first: [
-		[0, -2, 0],
-		[-2, 0, 0],
-		[2, 0, 0],
-		[0, 0, 2],
-		[0, 0, -2]
-	],
-	moves: [VERTICALS.DOWN, ...Object.values(HORIZONTALS)],
+	first: [[0, -2, 0]],
+	moves: [VERTICALS.DOWN],
 	attack: [
 		...Object.values(HORIZONTAL_DIAGONALS),
 		...Object.values(DOWN_DIAGONAL_DIAGONALS),

@@ -8,7 +8,7 @@ export type Piece = 'queen' | 'king' | 'bishop' | 'knight' | 'rook' | 'pawn' | '
 export const BOARDSIZE = 8;
 export type Side = 'white' | 'black' | '';
 // ----------------------->  x,      y,       z
-export type PieceCoords = [number, number, number];
+export type PieceCoords = number[];
 
 export type CellStates = 'selected' | 'activated' | 'highlighted';
 

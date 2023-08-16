@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Group } from 'three';
+	import { Group, BoxGeometry } from 'three';
 	import { T, forwardEventHandlers } from '@threlte/core';
 	import { useGltf } from '@threlte/extras';
 	import { interactivity } from '@threlte/extras';
