@@ -19,10 +19,5 @@
 </script>
 
 <T.Mesh position={piece ? [0.08, -0.37, 0] : position} scale={[0.1, 0.1, 0.1]}>
-	{#if piece}
-		<Piece name={piece} {coords} {idx} />
-	{:else}
-		<T.BoxGeometry args={[0, 0, 0]} />
-		<T.MeshBasicMaterial color="#ff0000" />
-	{/if}
+	<Piece name={piece} {coords} {idx} />
 </T.Mesh>

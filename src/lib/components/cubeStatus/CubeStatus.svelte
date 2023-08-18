@@ -13,8 +13,12 @@
 	export let pos: PieceCoords = [0, 0, 0];
 	export let cell: CellStore = board[pos[0]][pos[1]][pos[2]];
 
+	const c = get(cell);
+	const idx = pos[0] * pos[1] * pos[2];
+
 	let defaultEdges: MeshBasicMaterialParameters;
 	let defaultInnerColor: MeshBasicMaterialParameters;
+	let defaultSquare: MeshBasicMaterialParameters;
 
 	const scale = tweened(0, {
 		duration: 400,
@@ -42,7 +46,7 @@
 				const { inner, mesh } = updateBox(cellValue, true);
 				defaultEdges = mesh;
 				defaultInnerColor = inner;
-				scale.set(1);
+				scale.set(2.5);
 			} else {
 				scale.set(4);
 			}
@@ -50,6 +54,11 @@
 			scale.set(0);
 		}
 	});
+	const evenColor = { color: 0x000000, opacity: 0.03, transparent: true }; // black
+	const oddColor = { color: 0xffffff, opacity: 0.03, transparent: true }; // white
+	$: {
+		defaultEdges = idx % 2 === 0 ? evenColor : oddColor;
+	}
 </script>
 
 <T.Mesh
@@ -60,5 +69,8 @@
 	<T.BoxGeometry args={[innerCubeSize, innerCubeSize, innerCubeSize]} />
 	<T.MeshBasicMaterial args={[defaultInnerColor]} />
 </T.Mesh>
-
+<T.Mesh>
+	<T.BoxGeometry args={[innerCubeSize / 2, innerCubeSize / 2, innerCubeSize / 2]} />
+	<T.MeshBasicMaterial args={[defaultEdges]} />
+</T.Mesh>
 <T.MeshBasicMaterial args={[defaultEdges]} />
