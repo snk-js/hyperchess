@@ -13,7 +13,7 @@ function expandMovesByPosition(moves: Delta[], position: PieceCoords): PieceCoor
 		let z = position[2];
 
 		while (isWithinBounds(x, y, z)) {
-			const hasPiece = get(board)[x][y][z].piece;
+			const hasPiece = get(board[x][y][z]).piece;
 			if (hasPiece && i > 0) {
 				continue move;
 			}
@@ -24,18 +24,19 @@ function expandMovesByPosition(moves: Delta[], position: PieceCoords): PieceCoor
 			i++;
 		}
 	}
-	return expanded;
+	return expanded.filter((move) => {
+		return move[0] !== position[0] || move[1] !== position[1] || move[2] !== position[2];
+	});
 }
 
 function getMovesByPosition(moves: PieceCoords[], position: PieceCoords): PieceCoords[] {
-	const boardPieces = get(board);
 	return moves
 		.map(([dx, dy, dz]) => {
 			return [position[0] + dx, position[1] + dy, position[2] + dz];
 		})
 		.filter((move) => {
 			return (
-				isWithinBounds(move[0], move[1], move[2]) && !boardPieces[move[0]][move[1]][move[2]].piece
+				isWithinBounds(move[0], move[1], move[2]) && !get(board[move[0]][move[1]][move[2]]).piece
 			);
 		});
 }

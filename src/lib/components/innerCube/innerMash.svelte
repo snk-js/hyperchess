@@ -3,8 +3,8 @@
 	import { BoxGeometry } from 'three';
 	import CubeStatus from '../cubeStatus/CubeStatus.svelte';
 	import InnerCube from '../innerCube/innerCube.svelte';
-	import type { Cell } from '$lib/store';
 	import { interactivity } from '@threlte/extras';
+
 	interactivity();
 
 	export let i: number;
@@ -13,17 +13,12 @@
 	export let cubeSize: number;
 	export let innerCubeSize: number;
 	export let multiplier: number = 25;
-	export let cell: Cell;
 </script>
 
-<T.Mesh
-	on:mouseenter={(e) => console.log('click')}
-	key={i + ',' + j + ',' + k}
-	position={[i * cubeSize, j * cubeSize, k * cubeSize]}
->
+<T.Mesh key={i + ',' + j + ',' + k} position={[i * cubeSize, j * cubeSize, k * cubeSize]}>
 	<T.LineSegments>
 		<T.EdgesGeometry args={[new BoxGeometry(cubeSize, cubeSize, cubeSize)]} />
-		<CubeStatus {cell} {innerCubeSize} />
+		<CubeStatus {innerCubeSize} pos={[i, j, k]} />
 	</T.LineSegments>
 
 	<InnerCube

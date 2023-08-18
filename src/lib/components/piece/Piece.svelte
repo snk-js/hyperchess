@@ -1,21 +1,22 @@
 <script lang="ts">
-	import { Group, BoxGeometry } from 'three';
+	import { Group } from 'three';
 	import { T, forwardEventHandlers } from '@threlte/core';
 	import { useGltf } from '@threlte/extras';
 	import { interactivity } from '@threlte/extras';
 	import type { Cell, PieceCoords } from '$lib/store/';
-	import { board, clear, dummyCell } from '$lib/store/';
+	import { board, dummyCell } from '$lib/store/';
 	import { updateCellStatus } from '$lib/store/cellStates';
 	import { get } from 'svelte/store';
 	import Pieces from './Pieces.svelte';
 
 	export const ref = new Group();
 	export let idx: PieceCoords = [0, 0, 0];
+
 	let cell: Cell = dummyCell;
 
 	$: {
-		const newcell = get(board)[idx[0]][idx[1]][idx[2]];
-		cell = newcell;
+		const cellStore = board[idx[0]][idx[1]][idx[2]];
+		cell = get(cellStore);
 	}
 
 	interactivity();

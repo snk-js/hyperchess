@@ -2,12 +2,6 @@
 	import App from '$lib/components/App.svelte';
 	import { updatedCells } from '$lib/store/cellStates';
 	import { get } from 'svelte/store';
-
-	const ok = get(updatedCells);
-
-	$: {
-		console.log(ok);
-	}
 </script>
 
 <div>

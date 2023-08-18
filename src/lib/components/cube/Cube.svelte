@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { T } from '@threlte/core';
 	import { BoxGeometry } from 'three';
-	import { board } from '$lib/store';
 	import { offsetY } from '$lib/store/camera';
-	import type { Board } from '$lib/store';
 	import GridDivider from '../gridDivider/GridDivider.svelte';
 	import { tweened } from 'svelte/motion';
 	import { backInOut } from 'svelte/easing';
@@ -23,12 +21,6 @@
 	$: {
 		offsetYState.set($offsetY);
 	}
-
-	let boardState: Board;
-
-	$: board.subscribe((value: Board) => {
-		boardState = value;
-	});
 </script>
 
 <T.Mesh
@@ -40,7 +32,7 @@
 	{#each Array(cubesPerDimension) as _, i}
 		{#each Array(cubesPerDimension) as _, j}
 			{#each Array(cubesPerDimension) as _, k}
-				<InnerMash {i} {j} {k} {cubeSize} {innerCubeSize} cell={boardState[i][j][k]} />
+				<InnerMash {i} {j} {k} {cubeSize} {innerCubeSize} />
 			{/each}
 		{/each}
 	{/each}

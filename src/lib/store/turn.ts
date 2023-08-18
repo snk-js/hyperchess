@@ -1,5 +1,3 @@
-// create a svelte store for the turn of a chess game
-
 import { writable } from 'svelte/store';
 
 export const turn = writable(0);

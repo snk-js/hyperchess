@@ -1,6 +1,5 @@
 import { writable, get } from 'svelte/store';
 import type { Writable } from 'svelte/store';
-import { updatedCells, type UpdatedCell } from './cellStates';
 import { isWithinBounds } from '$lib/utils/moves';
 
 export type Piece = 'queen' | 'king' | 'bishop' | 'knight' | 'rook' | 'pawn' | '';
@@ -10,10 +9,17 @@ export type Side = 'white' | 'black' | '';
 // ----------------------->  x,      y,       z
 export type PieceCoords = number[];
 
-export type CellStates = 'selected' | 'activated' | 'highlighted';
+export type CellStates = 'selected' | 'activated';
 
-export type CellStatesMapping = {
+export type CellStatesMapping = Partial<{
 	[key in CellStates]: boolean;
+}> &
+	HighlightedState;
+
+export type HighlightedState = {
+	highlighted: Partial<{
+		[key in CellStates]: boolean;
+	}>;
 };
 
 export type PieceProps = {
@@ -23,33 +29,40 @@ export type PieceProps = {
 };
 
 export type Cell = PieceProps & CellStatesMapping;
+export type CellStore = Writable<Cell>;
 
 export const dummyCell: Cell = {
 	piece: '' as Piece,
 	selected: false,
 	activated: false,
 	coords: [0, 0, 0],
-	highlighted: false,
+	highlighted: {
+		activated: false,
+		selected: false
+	},
 	side: ''
 };
 
-export type Board = Cell[][][];
+export type Board = CellStore[][][];
 
-function createEmptyBoard(size = BOARDSIZE): Board {
-	const board: Board = new Array(size);
-	for (let i = 0; i < size; i++) {
-		board[i] = new Array(size);
-		for (let j = 0; j < size; j++) {
-			board[i][j] = new Array(size);
-			for (let k = 0; k < size; k++) {
-				board[i][j][k] = {
+function createBoard(): Board {
+	const board: Board = new Array(BOARDSIZE);
+	for (let i = 0; i < BOARDSIZE; i++) {
+		board[i] = new Array(BOARDSIZE);
+		for (let j = 0; j < BOARDSIZE; j++) {
+			board[i][j] = new Array(BOARDSIZE);
+			for (let k = 0; k < BOARDSIZE; k++) {
+				board[i][j][k] = writable({
 					piece: '',
 					selected: false,
 					activated: false,
 					coords: [i, j, k],
-					highlighted: false,
+					highlighted: {
+						activated: false,
+						selected: false
+					},
 					side: ''
-				};
+				});
 			}
 		}
 	}
@@ -98,74 +111,53 @@ const putPieces: PieceConfig[] = [
 	{ side: 'black', piece: 'pawn', coords: [2, 6, 5] }
 ];
 
-const initialBoard: Board = createEmptyBoard(BOARDSIZE);
+export const board: Board = createBoard();
 
 putPieces.forEach((pieceInfo) => {
 	const [x, y, z] = pieceInfo.coords;
-	initialBoard[x][y][z] = {
-		...initialBoard[x][y][z],
+	board[x][y][z].update((oldCell) => ({
+		...oldCell,
 		side: pieceInfo.side,
 		piece: pieceInfo.piece
-	};
+	}));
 });
 
-export const clear = () => {
-	try {
-		const cellsUpdated = get(updatedCells);
-
-		cellsUpdated.map((cell: UpdatedCell) => {
-			if (cell.coord)
-				updateCell(cell.coord, {
-					...cell,
-					selected: false,
-					activated: false,
-					highlighted: false
-				});
-		});
-		return 'ok';
-	} catch (e) {
-		return 'error';
-	}
-};
-
 export const updateCell = (coord: PieceCoords, cell: Partial<Cell>) => {
-	board.update((board) => {
-		const [x, y, z] = coord;
-		const oldCell = board[x][y][z];
-		board[x][y][z] = {
-			...oldCell,
-			...cell
-		};
-
-		return board;
-	});
+	const [x, y, z] = coord;
+	// Update only the specific cell store
+	board[x][y][z].update((oldCell) => ({
+		...oldCell,
+		...cell,
+		highlighted: {
+			...oldCell.highlighted,
+			...cell.highlighted
+		}
+	}));
 };
 
 export const updateCells = (cell: Partial<Cell>, coords: PieceCoords[]) => {
-	const newState = get(board);
 	coords.forEach((coord) => {
 		if (isWithinBounds(coord[0], coord[1], coord[2])) {
 			const [x, y, z] = coord;
-			newState[x][y][z] = {
-				...newState[x][y][z],
-				...cell
-			};
+			board[x][y][z].update((oldCell) => ({
+				...oldCell,
+				...cell,
+				highlighted: {
+					...oldCell.highlighted,
+					...cell.highlighted
+				}
+			}));
 		}
 	});
-
-	board.set(newState);
 };
 
 export const movePiece = (from: PieceCoords, to: PieceCoords) => {
-	const newState = get(board);
 	const [x1, y1, z1] = from;
 	const [x2, y2, z2] = to;
-	newState[x2][y2][z2] = newState[x1][y1][z1];
-	newState[x1][y1][z1] = {
-		...newState[x1][y1][z1],
+	const sourcePiece = get(board[x1][y1][z1]);
+	board[x2][y2][z2].set(sourcePiece);
+	board[x1][y1][z1].set({
+		...sourcePiece,
 		piece: ''
-	};
-	board.set(newState);
+	});
 };
-
-export const board: Writable<Board> = writable(initialBoard);

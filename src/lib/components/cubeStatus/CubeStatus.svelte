@@ -1,60 +1,60 @@
-<!-- CubeStatus.svelte -->
 <script lang="ts">
 	import { T } from '@threlte/core';
-	import { dummyCell } from '$lib/store/';
-	import type { Cell, PieceCoords } from '$lib/store/';
+	import { updateCell } from '$lib/store/';
+	import type { CellStore, PieceCoords } from '$lib/store/';
 	import { tweened } from 'svelte/motion';
 	import { backInOut } from 'svelte/easing';
-	// import { highlightMoves } from './highlightMoves';
 	import { updateBox } from './cellStyles';
+	import { get } from 'svelte/store';
+	import { board } from '$lib/store/';
+	import type { MeshBasicMaterialParameters } from 'three';
 
-	export let cell: Cell = dummyCell;
 	export let innerCubeSize: number;
+	export let pos: PieceCoords = [0, 0, 0];
+	export let cell: CellStore = board[pos[0]][pos[1]][pos[2]];
+
+	let defaultEdges: MeshBasicMaterialParameters;
+	let defaultInnerColor: MeshBasicMaterialParameters;
 
 	const scale = tweened(0, {
 		duration: 400,
 		easing: backInOut
 	});
 
-	$: {
-		if (cell.activated || cell.selected || cell.highlighted) {
-			scale.set(4);
+	const handleSelectHighlighted = (select: boolean) => {
+		const cellValue = get(cell);
+		if (cellValue.highlighted.activated) {
+			updateCell(cellValue.coords, {
+				highlighted: {
+					selected: select
+				}
+			});
+		}
+	};
+
+	cell?.subscribe((cellValue) => {
+		const { inner, mesh } = updateBox(cellValue);
+		defaultEdges = mesh;
+		defaultInnerColor = inner;
+
+		if (cellValue.activated || cellValue.selected || cellValue.highlighted.activated) {
+			if (cellValue.highlighted.selected && !cellValue.selected) {
+				const { inner, mesh } = updateBox(cellValue, true);
+				defaultEdges = mesh;
+				defaultInnerColor = inner;
+				scale.set(1);
+			} else {
+				scale.set(4);
+			}
 		} else {
 			scale.set(0);
 		}
-	}
-
-	let defaultEdges = updateBox(cell).mesh;
-	let defaultInnerColor = updateBox(cell).inner;
-
-	const updateStyle = (cell: Cell, isAvailableMove?: boolean) => {
-		const { inner, mesh } = updateBox(cell, isAvailableMove);
-		defaultEdges = mesh;
-		defaultInnerColor = inner;
-	};
-
-	const handleOnAvailableMove = () => {
-		if (cell.highlighted) {
-			updateStyle(cell, true);
-			scale.set(6);
-		}
-	};
-
-	const handleOutAvailableMove = () => {
-		if (cell.highlighted) {
-			updateStyle(cell);
-			scale.set(4);
-		}
-	};
-
-	$: {
-		updateStyle(cell);
-	}
+	});
 </script>
 
 <T.Mesh
-	on:pointerover={handleOnAvailableMove}
-	on:pointerleave={handleOutAvailableMove}
+	on:pointerover={() => handleSelectHighlighted(true)}
+	on:pointerleave={() => handleSelectHighlighted(false)}
 	scale={$scale}
 >
 	<T.BoxGeometry args={[innerCubeSize, innerCubeSize, innerCubeSize]} />

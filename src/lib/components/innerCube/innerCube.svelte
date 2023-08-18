@@ -11,7 +11,8 @@
 	let coords: PieceCoords = [0, 0, 0];
 
 	$: {
-		const cell = get(board)[idx[0]][idx[1]][idx[2]];
+		const cellStore = board[idx[0]][idx[1]][idx[2]];
+		const cell = get(cellStore);
 		coords = cell.coords;
 		piece = cell.piece || '';
 	}
