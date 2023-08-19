@@ -1,7 +1,5 @@
 <script lang="ts">
 	import App from '$lib/components/App.svelte';
-	import { updatedCells } from '$lib/store/cellStates';
-	import { get } from 'svelte/store';
 </script>
 
 <div>

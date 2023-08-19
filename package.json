@@ -38,6 +38,7 @@
 	"type": "module",
 	"dependencies": {
 		"@types/lodash": "^4.14.197",
-		"lodash": "^4.17.21"
+		"lodash": "^4.17.21",
+		"postprocessing": "^6.33.0"
 	}
 }

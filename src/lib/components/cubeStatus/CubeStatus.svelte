@@ -13,12 +13,12 @@
 	export let pos: PieceCoords = [0, 0, 0];
 	export let cell: CellStore = board[pos[0]][pos[1]][pos[2]];
 
-	const c = get(cell);
+	let c = get(cell);
+
 	const idx = pos[0] * pos[1] * pos[2];
 
 	let defaultEdges: MeshBasicMaterialParameters;
 	let defaultInnerColor: MeshBasicMaterialParameters;
-	let defaultSquare: MeshBasicMaterialParameters;
 
 	const scale = tweened(0, {
 		duration: 400,
@@ -36,14 +36,15 @@
 		}
 	};
 
-	cell?.subscribe((cellValue) => {
-		const { inner, mesh } = updateBox(cellValue);
+	cell?.subscribe((newCell) => {
+		c = newCell;
+		const { inner, mesh } = updateBox(newCell);
 		defaultEdges = mesh;
 		defaultInnerColor = inner;
 
-		if (cellValue.activated || cellValue.selected || cellValue.highlighted.activated) {
-			if (cellValue.highlighted.selected && !cellValue.selected) {
-				const { inner, mesh } = updateBox(cellValue, true);
+		if (newCell.activated || newCell.selected || newCell.highlighted.activated) {
+			if (newCell.highlighted.selected && !newCell.selected) {
+				const { inner, mesh } = updateBox(newCell, true);
 				defaultEdges = mesh;
 				defaultInnerColor = inner;
 				scale.set(2.5);
@@ -54,11 +55,18 @@
 			scale.set(0);
 		}
 	});
-	const evenColor = { color: 0x000000, opacity: 0.03, transparent: true }; // black
-	const oddColor = { color: 0xffffff, opacity: 0.03, transparent: true }; // white
+	const evenColor = { color: 0x000000, opacity: 0.1, transparent: true }; // black
+	const oddColor = { color: 0xffffff, opacity: 0.1, transparent: true }; // white
 	$: {
 		defaultEdges = idx % 2 === 0 ? evenColor : oddColor;
 	}
+
+	const glowMaterial = {
+		color: 0xffffff, // white
+		emissive: 0xff0000, // red, for example
+		opacity: 1,
+		transparent: false
+	};
 </script>
 
 <T.Mesh
@@ -70,7 +78,6 @@
 	<T.MeshBasicMaterial args={[defaultInnerColor]} />
 </T.Mesh>
 <T.Mesh>
-	<T.BoxGeometry args={[innerCubeSize / 2, innerCubeSize / 2, innerCubeSize / 2]} />
 	<T.MeshBasicMaterial args={[defaultEdges]} />
 </T.Mesh>
 <T.MeshBasicMaterial args={[defaultEdges]} />

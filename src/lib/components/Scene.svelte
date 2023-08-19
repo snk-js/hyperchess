@@ -2,8 +2,10 @@
 	import { T } from '@threlte/core';
 	import { OrbitControls } from '@threlte/extras';
 	import Cube from './cube/Cube.svelte';
+	import GlowingSphere from './glowingSphere/GlowingSphere.svelte';
 </script>
 
+<GlowingSphere />
 <T.PerspectiveCamera
 	camera={{ background: 'bgTexture' }}
 	makeDefault
@@ -15,7 +17,6 @@
 
 <T.DirectionalLight intensity={2} position.x={5} position.y={1} />
 <T.AmbientLight intensity={0.89} />
-
 <!-- <Grid
 	position.y={-0.001}
 	cellColor="#ffffff"
