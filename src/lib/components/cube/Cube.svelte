@@ -6,9 +6,9 @@
 	import { tweened } from 'svelte/motion';
 	import { backInOut } from 'svelte/easing';
 	import InnerMash from '../innerCube/innerMash.svelte';
-	import { boardUpdates } from '$lib/store';
-
-	import { onMount, onDestroy } from 'svelte';
+	import { board, boardUpdates } from '$lib/store';
+	import { updatedCells } from '$lib/store/cellStates';
+	import { get } from 'svelte/store';
 
 	const cubesPerDimension = 8;
 	const totalSize = 3;
@@ -24,6 +24,21 @@
 	$: {
 		offsetYState.set($offsetY);
 	}
+
+	boardUpdates.subscribe(async (updatedMoves) => {
+		get(updatedCells).forEach((move) => {
+			const [i, j, k] = move.coord;
+			board[i][j][k].update((cell) => {
+				return {
+					...cell,
+					highlighted: {
+						activated: false,
+						selected: false
+					}
+				};
+			});
+		});
+	});
 </script>
 
 <T.Mesh

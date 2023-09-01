@@ -4,6 +4,7 @@
 	import Piece from '../piece/Piece.svelte';
 	import { board, boardUpdates } from '$lib/store/';
 	import { get } from 'svelte/store';
+	import { updatedCells } from '$lib/store/cellStates';
 
 	export let idx: PieceCoords = [0, 0, 0];
 	let piece: string;
@@ -16,8 +17,8 @@
 		piece = cell.piece || '';
 	}
 
-	boardUpdates.subscribe(async (updatedMoves) => {
-		idx = [idx[0], idx[1], idx[2]];
+	boardUpdates.subscribe(async () => {
+		idx = idx;
 	});
 </script>
 

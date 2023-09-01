@@ -8,7 +8,6 @@ export type UpdatedCell = {
 } & Partial<CellStatesMapping>;
 
 export const updatedCells = writable<UpdatedCell[]>([]);
-export const highlightedActivated = writable<string>('');
 
 export const updateCellStatus = (coords: PieceCoords[], cellState: CellStates, state: boolean) => {
 	updateCells({ [cellState]: state }, coords);
