@@ -130,6 +130,7 @@ export const updateCell = (coord: PieceCoords, cell: Partial<Cell>) => {
 	board[x][y][z].update((oldCell) => ({
 		...oldCell,
 		...cell,
+		coords: oldCell.coords,
 		highlighted: {
 			...oldCell.highlighted,
 			...cell.highlighted
@@ -144,6 +145,7 @@ export const updateCells = (cell: Partial<Cell>, coords: PieceCoords[]) => {
 			board[x][y][z].update((oldCell) => ({
 				...oldCell,
 				...cell,
+				coords: oldCell.coords,
 				highlighted: {
 					...oldCell.highlighted,
 					...cell.highlighted
@@ -152,6 +154,22 @@ export const updateCells = (cell: Partial<Cell>, coords: PieceCoords[]) => {
 			}));
 		}
 	});
+};
+
+const exchangePiece = (coord: PieceCoords, cell: Cell) => {
+	const [x, y, z] = coord;
+	// Update only the specific cell store
+	board[x][y][z].update((oldCell) => ({
+		piece: cell.piece,
+		side: cell.side,
+		coords: oldCell.coords,
+		highlighted: {
+			activated: false,
+			selected: false
+		},
+		activated: false,
+		selected: false
+	}));
 };
 
 export const movePiece = (from: PieceCoords, to: PieceCoords) => {
@@ -164,8 +182,8 @@ export const movePiece = (from: PieceCoords, to: PieceCoords) => {
 		// TODO: capture piece
 	}
 
-	updateCell(to, sourcePiece);
-	updateCell(from, target);
+	exchangePiece(to, sourcePiece);
+	exchangePiece(from, target);
 
 	boardUpdates.update((cells) => [...cells, [sourcePiece, target]]);
 };

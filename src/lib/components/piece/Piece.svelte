@@ -9,10 +9,6 @@
 	import { get } from 'svelte/store';
 	import Pieces from './Pieces.svelte';
 	import { selectedPiece } from '../cubeStatus/CubeStatus.svelte';
-	import type { Box3, Vector3 } from 'three';
-
-	let boundingBox: Box3 | undefined;
-	let center: Vector3 | undefined;
 
 	export const ref = new Group();
 	export let idx: PieceCoords = [0, 0, 0];
@@ -53,14 +49,7 @@
 	{#await gltf}
 		<slot name="fallback" />
 	{:then gltf}
-		<Center
-			autoCenter={true}
-			on:center={({ boundingBox: newBoundingBox, center: newCenter }) => {
-				center = newCenter;
-				boundingBox = newBoundingBox;
-			}}
-			let:center
-		>
+		<Center autoCenter={true}>
 			<T.Group
 				rotation={(cell.side === 'black' && [0, 0, 3.15]) || [0, 0, 0]}
 				position={cell.side === 'black' ? [0, 5.5, 0] : [0, 1.8, 0]}
@@ -74,11 +63,6 @@
 				{/if}
 			</T.Group>
 		</Center>
-		{#if boundingBox && center}
-			<T.Group position.x={center.x} position.y={center.y} position.z={center.z}>
-				<T.Box3Helper args={[boundingBox, 0xff000000]} />
-			</T.Group>
-		{/if}
 	{:catch error}
 		<slot name="error" {error} />
 	{/await}

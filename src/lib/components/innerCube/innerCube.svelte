@@ -4,7 +4,6 @@
 	import Piece from '../piece/Piece.svelte';
 	import { board, boardUpdates } from '$lib/store/';
 	import { get } from 'svelte/store';
-	import { onMount } from 'svelte';
 
 	export let idx: PieceCoords = [0, 0, 0];
 	let piece: string;
