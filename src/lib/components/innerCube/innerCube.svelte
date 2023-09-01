@@ -2,10 +2,10 @@
 	import type { PieceCoords } from '$lib/store/';
 	import { T } from '@threlte/core';
 	import Piece from '../piece/Piece.svelte';
-	import { board } from '$lib/store/';
+	import { board, boardUpdates } from '$lib/store/';
 	import { get } from 'svelte/store';
+	import { onMount } from 'svelte';
 
-	export let position: [number, number, number] = [0, 0, 0];
 	export let idx: PieceCoords = [0, 0, 0];
 	let piece: string;
 	let coords: PieceCoords = [0, 0, 0];
@@ -16,8 +16,12 @@
 		coords = cell.coords;
 		piece = cell.piece || '';
 	}
+
+	boardUpdates.subscribe(async (updatedMoves) => {
+		idx = [idx[0], idx[1], idx[2]];
+	});
 </script>
 
-<T.Mesh position={piece ? [0.08, -0.37, 0] : position} scale={[0.1, 0.1, 0.1]}>
+<T.Mesh scale={[0.1, 0.1, 0.1]}>
 	<Piece name={piece} {coords} {idx} />
 </T.Mesh>

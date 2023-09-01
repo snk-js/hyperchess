@@ -113,6 +113,8 @@ const putPieces: PieceConfig[] = [
 
 export const board: Board = createBoard();
 
+export const boardUpdates = writable<Cell[][]>([]);
+
 putPieces.forEach((pieceInfo) => {
 	const [x, y, z] = pieceInfo.coords;
 	board[x][y][z].update((oldCell) => ({
@@ -145,7 +147,8 @@ export const updateCells = (cell: Partial<Cell>, coords: PieceCoords[]) => {
 				highlighted: {
 					...oldCell.highlighted,
 					...cell.highlighted
-				}
+				},
+				selected: cell.selected ?? oldCell.selected
 			}));
 		}
 	});
@@ -155,9 +158,14 @@ export const movePiece = (from: PieceCoords, to: PieceCoords) => {
 	const [x1, y1, z1] = from;
 	const [x2, y2, z2] = to;
 	const sourcePiece = get(board[x1][y1][z1]);
-	board[x2][y2][z2].set(sourcePiece);
-	board[x1][y1][z1].set({
-		...sourcePiece,
-		piece: ''
-	});
+	const target = get(board[x2][y2][z2]);
+
+	if (target.piece) {
+		// TODO: capture piece
+	}
+
+	updateCell(to, sourcePiece);
+	updateCell(from, target);
+
+	boardUpdates.update((cells) => [...cells, [sourcePiece, target]]);
 };

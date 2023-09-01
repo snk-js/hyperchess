@@ -6,6 +6,9 @@
 	import { tweened } from 'svelte/motion';
 	import { backInOut } from 'svelte/easing';
 	import InnerMash from '../innerCube/innerMash.svelte';
+	import { boardUpdates } from '$lib/store';
+
+	import { onMount, onDestroy } from 'svelte';
 
 	const cubesPerDimension = 8;
 	const totalSize = 3;
@@ -28,7 +31,6 @@
 	position.z={-centralizedSize}
 	position.x={-centralizedSize}
 >
-	<!-- Create a 3D grid of smaller cubes. -->
 	{#each Array(cubesPerDimension) as _, i}
 		{#each Array(cubesPerDimension) as _, j}
 			{#each Array(cubesPerDimension) as _, k}

@@ -1,13 +1,18 @@
 <script lang="ts">
 	import { Group } from 'three';
 	import { T, forwardEventHandlers } from '@threlte/core';
-	import { useGltf } from '@threlte/extras';
+	import { Center, useGltf } from '@threlte/extras';
 	import { interactivity } from '@threlte/extras';
 	import type { Cell, PieceCoords } from '$lib/store/';
-	import { board, dummyCell } from '$lib/store/';
+	import { board, boardUpdates, dummyCell } from '$lib/store/';
 	import { updateCellStatus } from '$lib/store/cellStates';
 	import { get } from 'svelte/store';
 	import Pieces from './Pieces.svelte';
+	import { selectedPiece } from '../cubeStatus/CubeStatus.svelte';
+	import type { Box3, Vector3 } from 'three';
+
+	let boundingBox: Box3 | undefined;
+	let center: Vector3 | undefined;
 
 	export const ref = new Group();
 	export let idx: PieceCoords = [0, 0, 0];
@@ -27,16 +32,20 @@
 
 	const component = forwardEventHandlers();
 
-	const handlePointerOver = () => {
+	const handlePointerOver = (e: Event) => {
+		e.stopPropagation();
 		updateCellStatus([cell.coords], 'activated', true);
 	};
 
-	const handleMouseLeave = () => {
+	const handleMouseLeave = (e: Event) => {
+		e.stopPropagation();
 		updateCellStatus([cell.coords], 'activated', false);
 	};
 
-	const handleClick = () => {
+	const handleClick = (e: Event) => {
+		e.stopPropagation();
 		updateCellStatus([cell.coords], 'selected', true);
+		selectedPiece.set(cell.coords);
 	};
 </script>
 
@@ -44,22 +53,32 @@
 	{#await gltf}
 		<slot name="fallback" />
 	{:then gltf}
-		<T.Group position={[-0.75, 0, 0]}>
-			<T.Group position={[0, 0, 0]}>
-				<T.Group
-					rotation={(cell.side === 'black' && [0, 0, 3.15]) || [0, 0, 0]}
-					position={cell.side === 'black' ? [0, 5.5, 0] : [0, 1.8, 0]}
-					scale={0.5}
-					on:pointerover={handlePointerOver}
-					on:pointerout={handleMouseLeave}
-					on:click={handleClick}
-				>
-					{#if cell.piece}
-						<Pieces {gltf} side={cell.side} piece={cell.piece} />
-					{/if}
-				</T.Group>
+		<Center
+			autoCenter={true}
+			on:center={({ boundingBox: newBoundingBox, center: newCenter }) => {
+				center = newCenter;
+				boundingBox = newBoundingBox;
+			}}
+			let:center
+		>
+			<T.Group
+				rotation={(cell.side === 'black' && [0, 0, 3.15]) || [0, 0, 0]}
+				position={cell.side === 'black' ? [0, 5.5, 0] : [0, 1.8, 0]}
+				scale={0.5}
+				on:pointerover={handlePointerOver}
+				on:pointerout={handleMouseLeave}
+				on:click={handleClick}
+			>
+				{#if cell.piece}
+					<Pieces {gltf} side={cell.side} piece={cell.piece} />
+				{/if}
 			</T.Group>
-		</T.Group>
+		</Center>
+		{#if boundingBox && center}
+			<T.Group position.x={center.x} position.y={center.y} position.z={center.z}>
+				<T.Box3Helper args={[boundingBox, 0xff000000]} />
+			</T.Group>
+		{/if}
 	{:catch error}
 		<slot name="error" {error} />
 	{/await}

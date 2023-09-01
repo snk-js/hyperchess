@@ -1,7 +1,23 @@
+<script context="module" lang="ts">
+	import { writable } from 'svelte/store';
+	import { debounce } from 'lodash'; // You can install lodash debounce to throttle functions
+	// This will hold the shared state
+	export const selectedPiece = writable<PieceCoords>([]);
+
+	// Throttled function to update the store.
+	const throttledUpdate = debounce((coords: PieceCoords) => {
+		movePiece(get(selectedPiece), coords);
+	}, 100); // Assuming a 100ms delay to get the last fired event
+
+	export function addToMovePiece(coords: PieceCoords) {
+		throttledUpdate(coords);
+	}
+</script>
+
 <script lang="ts">
+	import { beforeUpdate, tick } from 'svelte';
 	import { T } from '@threlte/core';
-	import { updateCell } from '$lib/store/';
-	import type { CellStore, PieceCoords } from '$lib/store/';
+	import { updateCell, type PieceCoords, type CellStore, movePiece } from '$lib/store/';
 	import { tweened } from 'svelte/motion';
 	import { backInOut } from 'svelte/easing';
 	import { updateBox } from './cellStyles';
@@ -25,7 +41,8 @@
 		easing: backInOut
 	});
 
-	const handleSelectHighlighted = (select: boolean) => {
+	const handleActivateHighlighted = (e: Event, select: boolean) => {
+		e.stopPropagation();
 		const cellValue = get(cell);
 		if (cellValue.highlighted.activated) {
 			updateCell(cellValue.coords, {
@@ -55,23 +72,26 @@
 			scale.set(0);
 		}
 	});
+
 	const evenColor = { color: 0x000000, opacity: 0.1, transparent: true }; // black
 	const oddColor = { color: 0xffffff, opacity: 0.1, transparent: true }; // white
+
 	$: {
 		defaultEdges = idx % 2 === 0 ? evenColor : oddColor;
 	}
 
-	const glowMaterial = {
-		color: 0xffffff, // white
-		emissive: 0xff0000, // red, for example
-		opacity: 1,
-		transparent: false
+	const onClickAvailableMove = (e: Event) => {
+		e.stopPropagation();
+		if (get(cell).highlighted.selected) {
+			addToMovePiece(c.coords);
+		}
 	};
 </script>
 
 <T.Mesh
-	on:pointerover={() => handleSelectHighlighted(true)}
-	on:pointerleave={() => handleSelectHighlighted(false)}
+	on:pointerover={(e) => handleActivateHighlighted(e, true)}
+	on:pointerleave={(e) => handleActivateHighlighted(e, false)}
+	on:click={onClickAvailableMove}
 	scale={$scale}
 >
 	<T.BoxGeometry args={[innerCubeSize, innerCubeSize, innerCubeSize]} />
