@@ -3,6 +3,7 @@ current state of the game:
 - piece replacement is instable
 - needs websockets to connect two players
 - needs to validate move on the server
+
 [localhost-5173 (1).webm](https://github.com/snk-js/hyperchess/assets/34718184/eb851a8d-d12c-4477-8984-bc07f4f4de6b)
 
 
