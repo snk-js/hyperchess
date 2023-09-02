@@ -14,11 +14,11 @@
 			new EffectPass(
 				camera,
 				new BloomEffect({
-					intensity: 3,
-					luminanceThreshold: 0.4,
+					intensity: 1,
+					luminanceThreshold: 0.2,
 					height: 1,
 					width: 1,
-					luminanceSmoothing: 0.8,
+					luminanceSmoothing: 0.2,
 					mipmapBlur: true
 				})
 			)

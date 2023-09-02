@@ -1,21 +1,12 @@
 <script context="module" lang="ts">
 	import { writable } from 'svelte/store';
-	import { debounce } from 'lodash'; // You can install lodash debounce to throttle functions
-	// This will hold the shared state
 	export const selectedPiece = writable<PieceCoords>([]);
-
-	// Throttled function to update the store.
-	const throttledUpdate = debounce((coords: PieceCoords) => {
-		movePiece(get(selectedPiece), coords);
-	}, 100); // Assuming a 100ms delay to get the last fired event
-
 	export function addToMovePiece(coords: PieceCoords) {
-		throttledUpdate(coords);
+		movePiece(get(selectedPiece), coords);
 	}
 </script>
 
 <script lang="ts">
-	import { beforeUpdate, tick } from 'svelte';
 	import { T } from '@threlte/core';
 	import { updateCell, type PieceCoords, type CellStore, movePiece } from '$lib/store/';
 	import { tweened } from 'svelte/motion';

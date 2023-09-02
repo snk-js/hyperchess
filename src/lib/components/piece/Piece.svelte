@@ -4,7 +4,7 @@
 	import { Center, useGltf } from '@threlte/extras';
 	import { interactivity } from '@threlte/extras';
 	import type { Cell, PieceCoords } from '$lib/store/';
-	import { board, boardUpdates, dummyCell } from '$lib/store/';
+	import { board, dummyCell } from '$lib/store/';
 	import { updateCellStatus } from '$lib/store/cellStates';
 	import { get } from 'svelte/store';
 	import Pieces from './Pieces.svelte';

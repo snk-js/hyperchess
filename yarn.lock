@@ -294,10 +294,10 @@
     svelte-hmr "^0.15.2"
     vitefu "^0.2.4"
 
-"@threlte/core@latest":
-  version "6.0.3"
-  resolved "https://registry.npmjs.org/@threlte/core/-/core-6.0.3.tgz"
-  integrity sha512-5fTK+iQGeXpqU3HVKp6CkWIXa1KlUxarvChQU+GhU1ScgmqFn791S0fQsFammrufqNLEWzpG8IG0q1iE7fpQkQ==
+"@threlte/core@^6.0.6":
+  version "6.0.6"
+  resolved "https://registry.yarnpkg.com/@threlte/core/-/core-6.0.6.tgz#9883532976f0dd9c70286f05d669c59271778697"
+  integrity sha512-nB1MgGc/3vXmsbrgPVK9m9lTrFx5EdPB368oagzZZxzmqLD60aEmbRzF9JfyWtU59HP7KBLWC3Z8pXb883a4Sg==
 
 "@threlte/extras@^5.4.1":
   version "5.4.1"
