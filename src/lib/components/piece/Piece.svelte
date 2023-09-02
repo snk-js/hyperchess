@@ -21,9 +21,8 @@
 	}
 
 	interactivity();
-	const gltf = useGltf('/src/lib/components/piece/scene-transformed.glb', {
-		useDraco: true,
-		useMeshopt: true
+	const gltf = useGltf('hyperchess/objects/scene-transformed.glb', {
+		useDraco: true
 	});
 
 	const component = forwardEventHandlers();

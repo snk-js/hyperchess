@@ -16,13 +16,14 @@ const config = {
 		adapter: adapter({
 			pages: 'build',
 			strict: false,
-			fallback: '200.html',
+			fallback: 'index.html',
 			assets: 'build',
 			precompress: false
-		})
-	},
-	paths: {
-		base: dev ? '' : process.env.BASE_PATH
+		}),
+
+		paths: {
+			base: dev ? '' : '/hyperchess'
+		}
 	}
 };
 
