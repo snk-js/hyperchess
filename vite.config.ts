@@ -1,19 +1,9 @@
-import adapter from '@sveltejs/adapter-static';
 import { sveltekit } from '@sveltejs/kit/vite';
-import { vitePreprocess } from '@sveltejs/kit/vite';
-const dev = process.argv.includes('dev');
+import { defineConfig } from 'vite';
 
-/** @type { import('@sveltejs/kit/vite')} */
-export default {
-	preprocess: vitePreprocess(),
-	kit: {
-		adapter: adapter(),
-		paths: {
-			base: dev ? '' : '/hyperchess'
-		}
-	},
+export default defineConfig({
 	plugins: [sveltekit()],
 	ssr: {
-		noExternal: ['three']
+		noExternal: ['three', 'postprocessing']
 	}
-};
+});
