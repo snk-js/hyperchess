@@ -1,5 +1,10 @@
+current state of the game:
+- pieces are moving
+- piece replacement is instable
+- needs websockets to connect two players
+- needs to validate move on the server
+[localhost-5173 (1).webm](https://github.com/snk-js/hyperchess/assets/34718184/eb851a8d-d12c-4477-8984-bc07f4f4de6b)
 
-[Tab-1692220322371.webm](https://github.com/snk-js/hyperchess/assets/34718184/659b38cd-1cef-4ce7-a658-e21abe3f542b)
 
 # to run
 `yarn run dev -- --open`
