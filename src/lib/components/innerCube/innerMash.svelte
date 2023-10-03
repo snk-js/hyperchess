@@ -3,9 +3,6 @@
 	import { BoxGeometry } from 'three';
 	import CubeStatus from '../cubeStatus/CubeStatus.svelte';
 	import InnerCube from '../innerCube/innerCube.svelte';
-	import { interactivity } from '@threlte/extras';
-
-	interactivity();
 
 	export let i: number;
 	export let j: number;
