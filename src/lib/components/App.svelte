@@ -16,8 +16,4 @@
 	}
 </script>
 
-<!-- <div class="n">hello</div> -->
-<Canvas>
-	<Scene />
-</Canvas>
 <svelte:window on:keydown={handleKeydown} />
