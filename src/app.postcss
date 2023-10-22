@@ -3,11 +3,25 @@
 @tailwind components;
 @tailwind utilities;
 
-.glassmorphism {
+.glass {
 	background: rgba(255, 255, 255, 0.05);
 	backdrop-filter: blur(4px);
 	-webkit-backdrop-filter: blur(4px);
 	border-radius: 10px;
 	padding: 20px;
 	margin: 20px;
+}
+
+.table-custom {
+	color: rgba(255, 255, 255, 0.7);
+	background: rgba(0, 0, 0, 0.7);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	border-radius: 10px;
+	.table-head {
+		background: rgba(227, 0, 0, 0.2);
+	}
+	.table-foot {
+		background: rgba(0, 0, 0, 0.2);
+	}
 }

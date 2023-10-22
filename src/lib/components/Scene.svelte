@@ -7,8 +7,8 @@
 	export let enableZoom = false;
 </script>
 
-<T.PerspectiveCamera makeDefault position={[-10, -10, 2]} fov={5}>
-	<OrbitControls {autoRotate} {enableZoom} autoRotateSpeed={0.5} target.y={1} />
+<T.PerspectiveCamera makeDefault position={[-10, -19, -5]} fov={5}>
+	<OrbitControls {autoRotate} {enableZoom} autoRotateSpeed={0.5} target.y={1.5} />
 </T.PerspectiveCamera>
 
 <T.DirectionalLight intensity={2} position.x={5} position.y={1} />

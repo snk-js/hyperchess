@@ -1,4 +1,4 @@
 <script>
 </script>
 
-<footer class="glassmorphism h-20" />
+<footer class="glass h-20" />

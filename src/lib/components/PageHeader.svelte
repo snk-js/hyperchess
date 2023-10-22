@@ -1,7 +1,7 @@
 <script>
-    export let text = "Page Header";
+	export let text = 'Page Header';
 </script>
 
-<div class="glassmorphism">
-    {text}
+<div class="glass">
+	{text}
 </div>

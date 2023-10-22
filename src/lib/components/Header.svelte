@@ -2,7 +2,7 @@
 	import { Avatar } from '@skeletonlabs/skeleton';
 </script>
 
-<header class="glassmorphism">
+<header class="glass">
 	<div />
 
 	<div class="flex justify-end">

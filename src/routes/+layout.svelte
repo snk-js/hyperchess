@@ -19,12 +19,16 @@
 <AppShell>
 	<Header slot="header" />
 
-	<Sidebar slot="sidebarLeft" content="Sidebar Left Content" />
-	<Sidebar slot="sidebarRight" content="Sidebar Right Content" />
-
 	<!-- Router Slot -->
 	<slot />
 	<!-- ---- / ---- -->
 
 	<Footer slot="footer" />
 </AppShell>
+
+<style>
+	:global(body) {
+		margin: 0;
+		background: linear-gradient(180deg, rgba(13, 19, 32, 1) 0%, rgba(8, 12, 21, 1) 100%);
+	}
+</style>
