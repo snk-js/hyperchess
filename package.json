@@ -44,8 +44,12 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@lucia-auth/adapter-prisma": "^3.0.2",
+		"@lucia-auth/oauth": "latest",
 		"@types/lodash": "^4.14.197",
 		"lodash": "^4.17.21",
+		"lucia": "latest",
+		"@prisma/client": "latest",
 		"postprocessing": "^6.33.0"
 	}
 }
