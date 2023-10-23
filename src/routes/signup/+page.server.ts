@@ -44,6 +44,7 @@ export const actions: Actions = {
 		} catch (e) {
 			// check for unique constraint error in user table
 			if (e) {
+				console.log(e);
 				return fail(400, {
 					message: 'Username already taken'
 				});

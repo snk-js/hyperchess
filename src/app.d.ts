@@ -1,20 +1,17 @@
-import type { PrismaClient } from '@prisma/client';
-
+// See https://kit.svelte.dev/docs/types#app
+// for information about these interfaces
 declare global {
 	namespace App {
-		// interface Error {}
 		interface Locals {
-			auth: import('lucia-auth').AuthRequest;
+			auth: import('lucia').AuthRequest;
 		}
-		// interface PageData {}
-		// interface Platform {}
 	}
-	let __prisma: PrismaClient;
+}
 
-	/// <reference types="lucia-auth" />
-	declare namespace Lucia {
+/// <reference types="lucia" />
+declare global {
+	namespace Lucia {
 		type Auth = import('$lib/server/lucia').Auth;
-
 		type DatabaseUserAttributes = {
 			username: string;
 		};

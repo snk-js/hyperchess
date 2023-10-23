@@ -5,16 +5,9 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	try {
-		const session = await locals.auth.validate();
-		console.log({ session });
-
-		if (session) throw redirect(302, '/');
-		return {};
-	} catch (e) {
-		console.log({ e });
-		return {};
-	}
+	const session = await locals.auth.validate();
+	if (session) throw redirect(302, '/');
+	return {};
 };
 
 export const actions: Actions = {

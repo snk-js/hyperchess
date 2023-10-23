@@ -12,6 +12,18 @@
 	margin: 20px;
 }
 
+.error {
+	color: #e22727;
+}
+
+.gradient {
+	@apply bg-clip-text text-transparent box-decoration-clone;
+	/* Direction */
+	@apply bg-gradient-to-br;
+	/* Color Stops */
+	@apply from-primary-500 via-tertiary-500 to-secondary-500;
+}
+
 /* .table-custom {
 	color: rgba(255, 255, 255, 0.7);
 	background: rgba(0, 0, 0, 0.7);

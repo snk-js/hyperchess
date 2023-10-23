@@ -17,7 +17,7 @@
 
 <AppShell class="z-50">
 	<Header slot="header" />
-	<div class="z-50 h-full glass">
+	<div class="z-50 min-h-[726px] glass">
 		<slot />
 	</div>
 	<Footer slot="footer" />
