@@ -17,14 +17,22 @@
 		</h1>
 		<form method="post" use:enhance>
 			<div class="my-3">
-				<label for="username">Username</label>
-				<input name="username" id="username" /><br />
+				<label class='label' for="username">
+					<span>
+						username
+					</span>
+					<input class='input variant-soft-primary text-white' name="username" id="username" /><br />
+				</label>
 			</div>
 			<div class="my-3">
-				<label for="password">Password</label>
-				<input type="password" name="password" id="password" /><br />
+				<label class='label' for="password">
+					<span>
+						password
+					</span>
+					<input class='input variant-soft-primary text-white' type="password" name="password" id="password" /><br />
+				</label>
 			</div>
-			<button type="button" class="btn variant-filled-primary my-3 text-gray-800 font-bold">
+			<button type="button" class="w-full btn variant-filled-primary my-3 text-gray-800 font-bold">
 				<button type="submit">
 					<span class="font-bold"> Sign in </span>
 				</button>
@@ -33,6 +41,6 @@
 		{#if form?.message}
 			<p class="error">{form.message}</p>
 		{/if}
-		<a href="/signup" class="logo-item variant-ghost-primary">Sign up</a>
+		<a href="/signup" class="logo-item variant-ghost-primary my-12">Sign up</a>
 	</div>
 </AuthWrapper>

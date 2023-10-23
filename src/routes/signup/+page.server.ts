@@ -12,9 +12,15 @@ export const load: PageServerLoad = async ({ locals }) => {
 export const actions: Actions = {
 	default: async ({ request, locals }) => {
 		const formData = await request.formData();
+		const name = formData.get('name');
 		const username = formData.get('username');
 		const password = formData.get('password');
-		// basic check
+
+		if (typeof name !== 'string' || name.length < 2 || name.length > 31) {
+			return fail(400, {
+				message: 'Invalid username'
+			});
+		}
 		if (typeof username !== 'string' || username.length < 4 || username.length > 31) {
 			return fail(400, {
 				message: 'Invalid username'
@@ -30,10 +36,11 @@ export const actions: Actions = {
 				key: {
 					providerId: 'username', // auth method
 					providerUserId: username.toLowerCase(), // unique id when using "username" auth method
-					password // hashed by Lucia
+					password // hashed by Lucia,
 				},
 				attributes: {
-					username
+					username,
+					name
 				}
 			});
 			const session = await auth.createSession({

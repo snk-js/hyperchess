@@ -23,7 +23,7 @@ CREATE TABLE "auth_key" (
     "id" TEXT NOT NULL,
     "hashed_password" TEXT,
     "user_id" TEXT NOT NULL,
-    "primary_key" BOOLEAN NOT NULL,
+    "primary_key" BOOLEAN,
     "expires" BIGINT,
 
     CONSTRAINT "auth_key_pkey" PRIMARY KEY ("id")

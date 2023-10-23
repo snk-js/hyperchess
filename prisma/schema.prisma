@@ -11,7 +11,7 @@ datasource db {
 }
 
 model AuthUser {
-  id           String        @id @unique
+  id           String        @id @unique @default(uuid())
   name         String
   username     String        @unique
   email        String?       @unique
@@ -22,7 +22,7 @@ model AuthUser {
 }
 
 model AuthSession {
-  id             String   @id @unique
+  id             String   @id @unique @default(uuid())
   user_id        String
   active_expires BigInt
   idle_expires   BigInt
@@ -33,10 +33,10 @@ model AuthSession {
 }
 
 model AuthKey {
-  id              String   @id @unique
+  id              String   @id @unique @default(uuid())
   hashed_password String?
   user_id         String
-  primary_key     Boolean
+  primary_key     Boolean?
   expires         BigInt?
   auth_user       AuthUser @relation(references: [id], fields: [user_id], onDelete: Cascade)
 
