@@ -6,6 +6,7 @@
 
 	import { Canvas } from '@threlte/core';
 	import Scene from '$lib/components/Scene.svelte';
+	import { enhance } from '$app/forms';
 </script>
 
 <div class="absolute w-full h-full z-0 bg-blue-gray-600">
@@ -17,6 +18,7 @@
 
 <AppShell class="z-50">
 	<Header slot="header" />
+
 	<div class="z-50 min-h-[726px] glass">
 		<slot />
 	</div>

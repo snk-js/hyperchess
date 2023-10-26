@@ -14,6 +14,5 @@
 	}
 </script>
 
-<div class="min-h-80 w-full bg-red-200">asdasdsa</div>
 
 <svelte:window on:keydown={handleKeydown} />

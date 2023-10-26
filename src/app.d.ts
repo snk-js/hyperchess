@@ -15,7 +15,7 @@ declare global {
 		type DatabaseUserAttributes = {
 			username: string;
 			name: string;
-			email?: string;
+			email: string;
 		};
 
 		type DatabaseSessionAttributes = Record<string, never>;

@@ -1,20 +1,45 @@
 <script>
-	import { goto } from '$app/navigation';
+	import userStore from '$lib/store/user';
 	import { Avatar } from '@skeletonlabs/skeleton';
+	import { goto } from '$app/navigation';
 
-	const handleClick = () => {
-		goto('/login');
+	let username = '';
+
+	userStore.subscribe((user) => {
+		username = user.username || '';
+	});
+
+	const logout = async () => {
+		const logoutResponse = await fetch('/api/logout', {
+			method: 'POST'
+		});
+
+		logoutResponse.json().then((data) => {
+			if (data.message === 'success') {
+				userStore.set({ username: '' });
+				goto('/login');
+			}
+		});
 	};
 </script>
 
-<header class="glass">
-	<div />
-
-	<div class="flex justify-end">
-		<button on:click={handleClick} type="button" class="z-50 btn variant-soft-primary">Login</button
-		>
+<header class="glass h-16 flex items-center flex-row-reverse">
+	<div class="flex justify-end h-10">
+		<button type="button" class="btn variant-ghost-tertiary font-bold text-white">
+			{username}
+		</button>
+		{#if username}
+			<button
+				type="button"
+				class="z-50 mx-3 btn variant-filled-tertiary font-bold"
+				on:click={logout}
+			>
+				logout
+			</button>
+		{/if}
 	</div>
-	<div class="z-10 absolute left-0 top-0 w-full h-full flex justify-center">
+
+	<div class="absolute left-0 top-0 w-full h-full flex justify-center">
 		<Avatar src="/assets/knight_logo_large.png" width="w-20" rounded="rounded-full" />
 	</div>
 </header>

@@ -15,6 +15,7 @@ export const actions: Actions = {
 		const name = formData.get('name');
 		const username = formData.get('username');
 		const password = formData.get('password');
+		const email = formData.get('email');
 
 		if (typeof name !== 'string' || name.length < 2 || name.length > 31) {
 			return fail(400, {
@@ -40,7 +41,8 @@ export const actions: Actions = {
 				},
 				attributes: {
 					username,
-					name
+					name,
+					email
 				}
 			});
 			const session = await auth.createSession({
@@ -51,7 +53,7 @@ export const actions: Actions = {
 		} catch (e) {
 			// check for unique constraint error in user table
 			if (e) {
-				console.log(e);
+				console.log({ e });
 				return fail(400, {
 					message: 'Username already taken'
 				});
