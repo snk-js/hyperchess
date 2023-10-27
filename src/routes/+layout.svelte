@@ -3,14 +3,24 @@
 	import { AppShell } from '@skeletonlabs/skeleton';
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
-
 	import { Canvas } from '@threlte/core';
 	import Scene from '$lib/components/Scene.svelte';
-	import { enhance } from '$app/forms';
+	import { createMain, mainPageState } from '$lib/store/main';
+
+	let state = mainPageState;
+
+	const { subscribe } = createMain();
+
+	subscribe((value) => {
+		state = value;
+	});
 </script>
 
 <div class="absolute w-full h-full z-0 bg-blue-gray-600">
-	<div class="absolute w-full h-full z-0" />
+	{#if !state.playMode}
+		<div class="absolute w-full h-full z-0" />
+	{/if}
+
 	<Canvas>
 		<Scene />
 	</Canvas>
@@ -19,7 +29,7 @@
 <AppShell class="z-50">
 	<Header slot="header" />
 
-	<div class="z-50 min-h-[726px] glass">
+	<div class="m-4 z-50 glass p-4">
 		<slot />
 	</div>
 	<Footer slot="footer" />

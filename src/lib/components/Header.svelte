@@ -23,7 +23,7 @@
 	};
 </script>
 
-<header class="glass h-16 flex items-center flex-row-reverse">
+<header class="glass m-4 h-16 flex items-center flex-row-reverse">
 	<div class="flex justify-end h-10">
 		<button type="button" class="btn variant-ghost-tertiary font-bold text-white">
 			{username}
