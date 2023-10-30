@@ -29,7 +29,7 @@
 <AppShell class="z-50">
 	<Header slot="header" />
 
-	<div class="m-4 z-50 glass p-4">
+	<div class="m-4 z-50 glass p-4 flex justify-center items-center">
 		<slot />
 	</div>
 	<Footer slot="footer" />
@@ -38,7 +38,7 @@
 <style>
 	:global(body) {
 		margin: 0;
-		background: linear-gradient(180deg, rgba(13, 19, 32, 1) 0%, rgba(8, 12, 21, 1) 100%);
+		background: radial-gradient(circle, rgba(13, 19, 32, 1) 0%, rgb(16, 24, 43) 100%);
 		max-width: calc(100vw - 1rem);
 	}
 </style>

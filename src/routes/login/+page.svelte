@@ -11,25 +11,27 @@
 	<div>
 		<h1 class="h1 my-3">
 			<span
-				class="bg-gradient-to-br from-green-500 to-purple-400-400-300 bg-clip-text text-transparent box-decoration-clone"
+				class="bg-gradient-to-br from-green-500 to-purple-400 bg-clip-text text-transparent box-decoration-clone"
 				>Sign in</span
 			>
 		</h1>
 		<form method="post" use:enhance>
 			<div class="my-3">
-				<label class='label' for="username">
-					<span>
-						username
-					</span>
-					<input class='input variant-soft-primary text-white' name="username" id="username" /><br />
+				<label class="label" for="username">
+					<span> username </span>
+					<input class="input variant-soft-primary text-white" name="username" id="username" /><br
+					/>
 				</label>
 			</div>
 			<div class="my-3">
-				<label class='label' for="password">
-					<span>
-						password
-					</span>
-					<input class='input variant-soft-primary text-white' type="password" name="password" id="password" /><br />
+				<label class="label" for="password">
+					<span> password </span>
+					<input
+						class="input variant-soft-primary text-white"
+						type="password"
+						name="password"
+						id="password"
+					/><br />
 				</label>
 			</div>
 			<button type="button" class="w-full btn variant-filled-primary my-3 text-gray-800 font-bold">
