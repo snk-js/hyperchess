@@ -34,10 +34,8 @@
 					/><br />
 				</label>
 			</div>
-			<button type="button" class="w-full btn variant-filled-primary my-3 text-gray-800 font-bold">
-				<button type="submit">
-					<span class="font-bold"> Sign in </span>
-				</button>
+			<button type="submit" class="w-full btn variant-filled-primary my-3 text-gray-800 font-bold">
+				<span class="font-bold"> Sign in </span>
 			</button>
 		</form>
 		{#if form?.message}

@@ -80,7 +80,7 @@
 </script>
 
 <div class="flex gap-10">
-	<div class="glass h-96 w-80 m-auto p-4 text-green-200 font-bold">
+	<div class="glass w-80 m-auto p-4 text-green-200 font-bold">
 		<div class="asdasd">
 			<h1 class="h1 text-[2rem] gradient font-bold">Create a room</h1>
 			<form

@@ -21,7 +21,7 @@
 	}
 
 	interactivity();
-	const gltf = useGltf('/src/lib/components/piece/scene-transformed.glb', {
+	const gltf = useGltf('scene-transformed.glb', {
 		useDraco: true,
 		useMeshopt: true
 	});
