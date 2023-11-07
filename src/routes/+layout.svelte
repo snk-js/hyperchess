@@ -6,6 +6,9 @@
 	import { Canvas } from '@threlte/core';
 	import Scene from '$lib/components/Scene.svelte';
 	import { createMain, mainPageState } from '$lib/store/main';
+	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
+	import { storePopup } from '@skeletonlabs/skeleton';
+	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 
 	let state = mainPageState;
 

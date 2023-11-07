@@ -52,6 +52,18 @@
 		playing = value.playMode;
 	});
 
+	let popupSettings: PopupSettings = {
+		event: 'focus-click',
+		target: 'popupAutocomplete',
+		placement: 'bottom',
+		state: (state) => {
+			return {
+				...state,
+				visible: true
+			};
+		}
+	};
+
 	const sourceData = rooms.map((room) => {
 		return {
 			id: room.id,
@@ -77,6 +89,7 @@
 		// Optional: A list of footer labels.
 		foot: ['Total', '', '<code class="code">5</code>']
 	};
+	let inputPopup: string = '';
 </script>
 
 <div class="flex gap-10">
@@ -106,14 +119,18 @@
 					<label class="label" for="time">
 						<span> time strategy </span>
 						<input
-							type="search"
+							type="select one..."
 							bind:value={timeSelect}
 							placeholder="Search..."
-							class="input autocomplete variant-soft-primary text-white"
+							class="input p-2 variant-soft-primary text-white"
 							name="time"
 							id="time"
+							use:popup={popupSettings}
 						/>
-						<div class="card w-full max-w-sm max-h-48 p-4 overflow-y-auto glass">
+						<div
+							data-popup="popupAutocomplete"
+							class="card w-full max-w-sm max-h-48 p-4 overflow-y-auto glass"
+						>
 							<Autocomplete
 								class="variant-ghost-primary"
 								bind:input={timeSelect}
@@ -123,8 +140,8 @@
 						</div>
 						<br />
 					</label>
-					<button type="submit" class="btn variant-filled-secondary">play</button>
 				</div>
+				<button type="submit" class="btn variant-filled-secondary w-full">create room</button>
 			</form>
 		</div>
 	</div>
