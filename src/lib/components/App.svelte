@@ -1,17 +1,9 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import { decreaseOffsetY, increaseOffsetY } from '$lib/store/camera';
-	import { createMain, createRooms, type Room } from '$lib/store/main';
-	import {
-		Autocomplete,
-		popup,
-		type AutocompleteOption,
-		type PopupSettings,
-		Table,
-		tableMapperValues,
-		type TableSource
-	} from '@skeletonlabs/skeleton';
+	import { createMain } from '$lib/store/main';
 	import type { ActionData } from '../../routes/$types';
+	import Table from './Table/Table.svelte';
+	import CreateRoom from './createRoom/CreateRoom.svelte';
 
 	export let form: ActionData;
 
@@ -29,131 +21,19 @@
 		}
 	}
 
-	let timeSelect = '';
-
-	const timeStrategies: AutocompleteOption<string>[] = [
-		{ label: '5 min + 10s', value: '5+10', keywords: '5, 10' },
-		{ label: 'unlimited', value: 'unlimited', keywords: '0' }
-	];
-	function onFlavorSelection(event: CustomEvent<AutocompleteOption<string>>): void {
-		timeSelect = event.detail.label;
-	}
-
 	let playing = false;
-	let rooms: Room[] = [];
-
-	createRooms().subscribe((value) => {
-		rooms = value;
-	});
 
 	const { play, subscribe } = createMain();
 
 	subscribe((value) => {
 		playing = value.playMode;
 	});
-
-	let popupSettings: PopupSettings = {
-		event: 'focus-click',
-		target: 'popupAutocomplete',
-		placement: 'bottom',
-		state: (state) => {
-			return {
-				...state,
-				visible: true
-			};
-		}
-	};
-
-	const sourceData = rooms.map((room) => {
-		return {
-			id: room.id,
-			owner: room.owner.username,
-			name: room.name,
-			time: room.time,
-			side: 'random',
-			rating: '??'
-		};
-	});
-
-	const onSelected = () => {
-		console.log('selected');
-	};
-
-	const tableSimple: TableSource = {
-		// A list of heading labels.
-		head: ['name', 'time frame', 'rating'],
-		// The data visibly shown in your table body UI.
-		body: tableMapperValues(sourceData, ['name', 'time', 'rating']),
-		// Optional: The data returned when interactive is enabled and a row is clicked.
-		meta: tableMapperValues(sourceData, ['id', 'name', 'time', 'rating']),
-		// Optional: A list of footer labels.
-		foot: ['Total', '', '<code class="code">5</code>']
-	};
-	let inputPopup: string = '';
 </script>
 
 <div class="flex gap-10">
-	<div class="glass w-80 m-auto p-4 text-green-200 font-bold">
-		<div class="asdasd">
-			<h1 class="h1 text-[2rem] gradient font-bold">Create a room</h1>
-			<form
-				method="post"
-				use:enhance={() => {
-					return async ({ result }) => {
-						console.log({ result });
-					};
-				}}
-			>
-				<div class="my-3">
-					<label class="label" for="name">
-						<span> match name </span>
-						<input
-							placeholder="'Me and Gustavo match'"
-							class="input variant-soft-primary text-white"
-							name="name"
-							id="name"
-						/><br />
-					</label>
-				</div>
-				<div class="my-3">
-					<label class="label" for="time">
-						<span> time strategy </span>
-						<input
-							type="select one..."
-							bind:value={timeSelect}
-							placeholder="Search..."
-							class="input p-2 variant-soft-primary text-white"
-							name="time"
-							id="time"
-							use:popup={popupSettings}
-						/>
-						<div
-							data-popup="popupAutocomplete"
-							class="card w-full max-w-sm max-h-48 p-4 overflow-y-auto glass"
-						>
-							<Autocomplete
-								class="variant-ghost-primary"
-								bind:input={timeSelect}
-								options={timeStrategies}
-								on:selection={onFlavorSelection}
-							/>
-						</div>
-						<br />
-					</label>
-				</div>
-				<button type="submit" class="btn variant-filled-secondary w-full">create room</button>
-			</form>
-		</div>
-	</div>
+	<CreateRoom />
 	<div class="glass inline-flex">
-		<Table
-			source={tableSimple}
-			on:selected={onSelected}
-			element="table table-custom table-cell-fit"
-			regionHead="bg-red-200"
-			interactive={true}
-			text="placeholder-yellow-100"
-		/>
+		<Table />
 	</div>
 </div>
 

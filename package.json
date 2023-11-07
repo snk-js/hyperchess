@@ -58,6 +58,7 @@
 		"lodash": "^4.17.21",
 		"lucia": "latest",
 		"postprocessing": "^6.33.0",
+		"redis": "^4.6.10",
 		"zod": "^3.22.4"
 	}
 }
