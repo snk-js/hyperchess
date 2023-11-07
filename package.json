@@ -50,7 +50,7 @@
 	"dependencies": {
 		"@lucia-auth/adapter-prisma": "latest",
 		"@lucia-auth/oauth": "latest",
-		"@prisma/client": "^5.4.2",
+		"@prisma/client": "^5.5.2",
 		"@types/lodash": "^4.14.197",
 		"dotenv": "^16.3.1",
 		"express": "^4.17.1",
