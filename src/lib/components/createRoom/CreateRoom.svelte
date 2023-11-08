@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import redis from '$lib/server/redis';
+	import type { Room } from '$lib/store/rooms';
 	import {
 		Autocomplete,
 		popup,
@@ -60,7 +62,7 @@
 						type="select one..."
 						bind:value={timeSelect}
 						placeholder="Search..."
-						class="input p-2 variant-soft-primary text-white"
+						class="input autocomplete p-2 variant-soft-primary text-white"
 						name="time"
 						id="time"
 						use:popup={popupSettings}

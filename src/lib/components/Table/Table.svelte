@@ -1,10 +1,16 @@
 <script lang="ts">
-	import { createMain, createRooms, type Room } from '$lib/store/main';
+	import { createRooms, unsubscribeRedis, type Room } from '$lib/store/rooms';
 	import { Table, tableMapperValues, type TableSource } from '@skeletonlabs/skeleton';
+	import { onDestroy } from 'svelte';
 
 	let rooms: Room[] = [];
-	createRooms().subscribe((value) => {
-		rooms = value;
+
+	createRooms().subscribe(($rooms) => {
+		rooms = $rooms;
+	});
+
+	onDestroy(() => {
+		unsubscribeRedis('rooms');
 	});
 
 	const sourceData = rooms.map((room) => {

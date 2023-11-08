@@ -5,13 +5,15 @@ export interface User {
 	username?: string;
 	name?: string;
 	email?: string;
+	currentWsUrl?: string;
 }
 
 export const userPlaceholder = {
 	id: '',
 	name: '',
 	email: '',
-	username: ''
+	username: '',
+	currentWsUrl: ''
 };
 
 const userStore = writable<User>(userPlaceholder);

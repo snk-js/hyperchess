@@ -5,24 +5,16 @@
 	import Footer from '$lib/components/Footer.svelte';
 	import { Canvas } from '@threlte/core';
 	import Scene from '$lib/components/Scene.svelte';
-	import { createMain, mainPageState } from '$lib/store/main';
 	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
 	import { storePopup } from '@skeletonlabs/skeleton';
 	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
-
-	let state = mainPageState;
-
-	const { subscribe } = createMain();
-
-	subscribe((value) => {
-		state = value;
-	});
 </script>
 
 <div class="absolute w-full h-full z-0 bg-blue-gray-600">
-	{#if !state.playMode}
+	<!-- {#if !state.playMode}
 		<div class="absolute w-full h-full z-0" />
-	{/if}
+		{/if} -->
+	<div class="absolute w-full h-full z-0" />
 
 	<Canvas>
 		<Scene />
