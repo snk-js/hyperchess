@@ -22,7 +22,7 @@ export const actions: Actions = {
 				message: 'Invalid username'
 			});
 		}
-		if (typeof username !== 'string' || username.length < 4 || username.length > 31) {
+		if (typeof username !== 'string' || username.length < 4 || username.length > 20) {
 			return fail(400, {
 				message: 'Invalid username'
 			});

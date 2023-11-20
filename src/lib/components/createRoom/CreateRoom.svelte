@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import redis from '$lib/server/redis';
-	import type { Room } from '$lib/store/rooms';
 	import {
 		Autocomplete,
 		popup,

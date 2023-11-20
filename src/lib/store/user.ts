@@ -5,7 +5,10 @@ export interface User {
 	username?: string;
 	name?: string;
 	email?: string;
-	currentWsUrl?: string;
+	clientId?: string;
+	connected?: boolean;
+	wsUrl?: string;
+	ws?: WebSocket | null;
 }
 
 export const userPlaceholder = {
@@ -13,7 +16,10 @@ export const userPlaceholder = {
 	name: '',
 	email: '',
 	username: '',
-	currentWsUrl: ''
+	clientId: '',
+	connected: false,
+	wsUrl: '',
+	ws: null
 };
 
 const userStore = writable<User>(userPlaceholder);

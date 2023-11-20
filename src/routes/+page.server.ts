@@ -3,35 +3,74 @@ import { PrismaClient } from '@prisma/client';
 import userStore, { userPlaceholder } from '$lib/store/user';
 import type { PageServerLoad } from './$types';
 import { get } from 'svelte/store';
-import redis from '$lib/server/redis';
 import type { Room } from '$lib/store/rooms';
-
-function createRoom(roomData: Room) {
-	redis.publish('rooms', JSON.stringify({ method: 'createRoom', room: roomData }));
-}
-
-function deleteRoom(roomData: { id: string }) {
-	redis.publish('rooms', JSON.stringify({ method: 'deleteRoom', room: roomData }));
-}
 
 const prisma = new PrismaClient();
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, fetch }) => {
 	const session = await locals.auth.validate();
 	if (!session) {
 		userStore.set(userPlaceholder);
 		throw redirect(302, '/login');
 	}
 
+	const userState = get(userStore);
+
+	if (userState.id && userState.username && userState.clientId) {
+		return { user: userState };
+	}
+
+	const userId = session.user.userId;
+
 	const user = await prisma.authUser.findUnique({
 		where: {
-			id: session.user.userId
+			id: userId
 		}
 	});
 
-	return {
-		user
+	if (!user) {
+		throw redirect(302, '/login');
+	}
+
+	const userData = {
+		id: user.id,
+		name: user.name,
+		email: user.email || '',
+		username: user.username,
+		clientId: '',
+		connected: false,
+		wsUrl: ''
 	};
+
+	userStore.set(userData);
+
+	if (!userState.clientId) {
+		const userId = user.id;
+		const roomId = Number(userId.replace(/\D/g, ''));
+
+		const registerWsPayload = {
+			user_id: roomId || Math.floor(Math.random() * 1000),
+			topic: 'rooms'
+		};
+
+		const response = await fetch('api/ws', {
+			method: 'POST',
+			body: JSON.stringify(registerWsPayload)
+		});
+
+		const { result } = await response.json();
+
+		if (result?.url) {
+			const client_id = result.url.split('/').pop() as string;
+
+			userStore.set({
+				...userData,
+				wsUrl: result.url,
+				clientId: client_id
+			});
+		}
+	}
+	return { user: get(userStore) };
 };
 
 export const actions: Actions = {
@@ -59,24 +98,5 @@ export const actions: Actions = {
 			style: (formData.get('type') as Room['style']) || 'match',
 			side: (formData.get('type') as Room['side']) || 'random'
 		};
-
-		const response = await fetch('api/ws', {
-			method: 'POST',
-			body: JSON.stringify({ user_id: roomId })
-		});
-
-		return response.json().then((data) => {
-			if (data.message === 'sucess') {
-				userStore.update((n) => ({
-					...n,
-					currentWsUrl: data.result.url
-				}));
-				createRoom(roomValues);
-
-				return {
-					result: 'success'
-				};
-			}
-		});
 	}
 };
