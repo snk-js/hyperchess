@@ -17,6 +17,7 @@
 		logoutResponse.json().then((data) => {
 			if (data.message === 'success') {
 				userStore.set({ username: '' });
+				console.log('going login');
 				goto('/login');
 			}
 		});

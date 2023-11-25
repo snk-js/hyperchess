@@ -3,7 +3,8 @@ import { PrismaClient } from '@prisma/client';
 import userStore, { userPlaceholder } from '$lib/store/user';
 import type { PageServerLoad } from './$types';
 import { get } from 'svelte/store';
-import type { Room } from '$lib/store/rooms';
+import { roomsStore, type Room, createRooms } from '$lib/store/rooms';
+import { getDigitsFromString } from '$lib/utils';
 
 const prisma = new PrismaClient();
 
@@ -46,10 +47,10 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 
 	if (!userState.clientId) {
 		const userId = user.id;
-		const roomId = Number(userId.replace(/\D/g, ''));
+		const roomId = getDigitsFromString(userId);
 
 		const registerWsPayload = {
-			user_id: roomId || Math.floor(Math.random() * 1000),
+			user_id: roomId,
 			topic: 'rooms'
 		};
 
@@ -93,10 +94,13 @@ export const actions: Actions = {
 				id: id,
 				username: username
 			},
-			time: (formData.get('time') as Room['time']) || 'unlimited',
-			type: (formData.get('type') as Room['type']) || '',
-			style: (formData.get('type') as Room['style']) || 'match',
-			side: (formData.get('type') as Room['side']) || 'random'
+			time: formData.get('time') as Room['time'],
+			type: (formData.get('privacy') as Room['type']) || '',
+			style: formData.get('gameStyle') as Room['style'],
+			side: formData.get('side') as Room['side']
 		};
+
+		createRooms().add(roomValues);
+		return { roomValues };
 	}
 };

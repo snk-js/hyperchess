@@ -8,13 +8,25 @@ type RoomUser = {
 	username: string;
 };
 
+type Time =
+	| '30+10'
+	| '30+0'
+	| '15+15'
+	| '15+0'
+	| '10+0'
+	| '5+5'
+	| '5+0'
+	| '3+0'
+	| '1+0'
+	| 'unlimited'
+	| '';
 type RoomType = 'public' | 'private' | '';
 type Style = 'match' | 'sandbox' | '';
 type Side = 'black' | 'white' | 'random' | '';
 export type Room = {
 	id: number;
 	owner: RoomUser;
-	time: string;
+	time: Time;
 	type: RoomType;
 	style: Style;
 	side: Side;

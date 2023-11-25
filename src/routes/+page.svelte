@@ -4,8 +4,25 @@
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 	import { get } from 'svelte/store';
+	import { getDigitsFromString } from '$lib/utils';
+	import { connectWs, registerClient } from '$lib/utils/ws';
 
 	export let data: PageData;
+	let disconnected = false;
+
+	const disconect = () => {
+		disconnected = true;
+	};
+
+	$: {
+		console.log('reconnecting');
+		if (disconnected) {
+			const currentUser = get(userStore);
+			// try reconnect
+			registerClient(getDigitsFromString(currentUser.id as string), currentUser, disconect);
+			disconnected = false;
+		}
+	}
 
 	$: {
 		data?.user &&
@@ -18,34 +35,11 @@
 			});
 	}
 
-	const connectWs = (url: string, currentUser: User) => {
-		const con = () => new WebSocket(url);
-		const ws = con();
-		ws.onopen = () => {
-			sessionStorage.setItem('wsConnected', 'true');
-			console.log('connected');
-		};
-		ws.onclose = () => {
-			sessionStorage.removeItem('wsConnected');
-			console.log('disconnected');
-		};
-		ws.onerror = (err) => {
-			console.error(err);
-		};
-		return ws;
-	};
-
 	onMount(() => {
 		const currentUser = get(userStore);
-		const isConnected = sessionStorage.getItem('wsConnected');
-
-		if (isConnected) {
-			return;
-		}
-
 		const wsUrl = currentUser.wsUrl;
 		if (wsUrl) {
-			const ws = connectWs(wsUrl, currentUser);
+			const ws = connectWs(wsUrl, disconect);
 			ws.onmessage = (event) => {
 				// const message = JSON.parse(event.data);
 				console.log('message received', { e: event.data });
@@ -57,10 +51,6 @@
 				ws
 			});
 		}
-		const currentUser2 = get(userStore);
-
-		console.log({ currentUser2 });
-
 		return () => {
 			currentUser.ws?.close();
 			userStore.set(userPlaceholder);
