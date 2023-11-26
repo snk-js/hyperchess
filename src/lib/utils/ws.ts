@@ -1,5 +1,7 @@
+import { addRoom, roomsStore } from '$lib/store/rooms';
 import userStore from '$lib/store/user';
 import type { User } from 'lucia';
+import { get } from 'svelte/store';
 
 export const registerClient = async (userId: number, currentUser: User, disconect: () => void) => {
 	const response = await fetch('api/ws', {
@@ -13,8 +15,16 @@ export const registerClient = async (userId: number, currentUser: User, disconec
 		const ws = connectWs(result.url, disconect);
 
 		ws.onmessage = (event) => {
-			// const message = JSON.parse(event.data);
-			console.log('message received', { e: event.data });
+			const message = JSON.parse(event.data);
+			if (message.topic === 'rooms') {
+				addRoom(message.payload);
+				userStore.update((user) => {
+					return {
+						...user,
+						playing: true
+					};
+				});
+			}
 		};
 		userStore.set({
 			...currentUser,

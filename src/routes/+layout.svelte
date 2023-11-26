@@ -7,14 +7,20 @@
 	import Scene from '$lib/components/Scene.svelte';
 	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
 	import { storePopup } from '@skeletonlabs/skeleton';
+	import userStore from '$lib/store/user';
 	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
+
+	let playing = false;
+
+	userStore.subscribe((user) => {
+		playing = user.playing;
+	});
 </script>
 
 <div class="absolute w-full h-full z-0 bg-blue-gray-600">
-	<!-- {#if !state.playMode}
+	{#if !playing}
 		<div class="absolute w-full h-full z-0" />
-		{/if} -->
-	<div class="absolute w-full h-full z-0" />
+	{/if}
 
 	<Canvas>
 		<Scene />
@@ -24,7 +30,7 @@
 <AppShell class="z-50">
 	<Header slot="header" />
 
-	<div class="m-4 z-50 glass p-4 flex justify-center items-center">
+	<div class="">
 		<slot />
 	</div>
 	<Footer slot="footer" />

@@ -40,10 +40,6 @@
 		const wsUrl = currentUser.wsUrl;
 		if (wsUrl) {
 			const ws = connectWs(wsUrl, disconect);
-			ws.onmessage = (event) => {
-				// const message = JSON.parse(event.data);
-				console.log('message received', { e: event.data });
-			};
 
 			userStore.set({
 				...currentUser,

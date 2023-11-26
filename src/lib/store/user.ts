@@ -9,6 +9,7 @@ export interface User {
 	connected?: boolean;
 	wsUrl?: string;
 	ws?: WebSocket | null;
+	playing: boolean;
 }
 
 export const userPlaceholder = {
@@ -19,7 +20,8 @@ export const userPlaceholder = {
 	clientId: '',
 	connected: false,
 	wsUrl: '',
-	ws: null
+	ws: null,
+	playing: false
 };
 
 const userStore = writable<User>(userPlaceholder);

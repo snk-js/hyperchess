@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import type { Room } from '$lib/store/rooms';
+	import userStore from '$lib/store/user';
 	import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
+	import { get } from 'svelte/store';
 
 	// import {
 	// 	Autocomplete,
@@ -13,6 +16,20 @@
 	let privacy = 'public';
 	let gameStyle = 'match';
 	let side = 'random';
+
+	const publish = async (payload: Room) => {
+		const currentUserId = get(userStore).id;
+
+		const response = await fetch('api/publish', {
+			method: 'POST',
+			body: JSON.stringify({
+				topic: 'rooms',
+				message: JSON.stringify({ sender: currentUserId, payload, topic: 'rooms' })
+			})
+		});
+
+		console.log(await response.json());
+	};
 
 	// const timeStrategies: AutocompleteOption<string>[] = [
 	// 	{ label: '5 min + 10s', value: '5+10', keywords: '5, 10' },
@@ -36,9 +53,8 @@
 	// };
 </script>
 
-<div class="glass w-80 m-auto p-4 text-green-200 font-bold">
+<div class="glass p-4 text-green-200 font-bold">
 	<div class="asdasd">
-		<h1 class="h1 text-[2rem] gradient font-bold">Create a room</h1>
 		<form
 			method="post"
 			use:enhance={({ formData }) => {
@@ -47,7 +63,11 @@
 				formData.set('gameStyle', gameStyle);
 				formData.set('side', side);
 				return async ({ result }) => {
-					console.log({ result });
+					if (result?.data?.roomValues) {
+						const { roomValues } = result.data;
+						console.log(roomValues);
+						await publish(roomValues);
+					}
 				};
 			}}
 		>

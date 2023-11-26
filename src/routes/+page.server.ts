@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import userStore, { userPlaceholder } from '$lib/store/user';
 import type { PageServerLoad } from './$types';
 import { get } from 'svelte/store';
-import { roomsStore, type Room, createRooms } from '$lib/store/rooms';
+import type { Room } from '$lib/store/rooms';
 import { getDigitsFromString } from '$lib/utils';
 
 const prisma = new PrismaClient();
@@ -86,6 +86,19 @@ export const actions: Actions = {
 
 		const formData = await request.formData();
 
+		const time = formData.get('time') as Room['time'];
+		const type = formData.get('privacy') as Room['type'];
+		const style = formData.get('gameStyle') as Room['style'];
+		const side = formData.get('side') as Room['side'];
+
+		[time, type, style, side].forEach((value) => {
+			if (value.length > 10) {
+				return fail(400, {
+					message: 'Invalid room values'
+				});
+			}
+		});
+
 		const roomId = new Date().getTime();
 		// use zod to validate the things
 		const roomValues: Room = {
@@ -94,13 +107,12 @@ export const actions: Actions = {
 				id: id,
 				username: username
 			},
-			time: formData.get('time') as Room['time'],
-			type: (formData.get('privacy') as Room['type']) || '',
-			style: formData.get('gameStyle') as Room['style'],
-			side: formData.get('side') as Room['side']
+			time,
+			type,
+			style,
+			side
 		};
 
-		createRooms().add(roomValues);
 		return { roomValues };
 	}
 };

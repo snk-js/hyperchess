@@ -1,11 +1,47 @@
+import { tableMapperValues, type TableSource } from '@skeletonlabs/skeleton';
 import { writable } from 'svelte/store';
 // src/lib/store/index.ts
 
-export const roomsStore = writable([]);
+export const roomsStore = writable<Room[]>([]);
 
 type RoomUser = {
 	id: string;
 	username: string;
+};
+
+export const updateTableData = (sourceData: TableRowData[]) => {
+	return {
+		// A list of heading labels.
+		head: ['owner', 'time', 'side', 'rating', 'style'],
+		// The data visibly shown in your table body UI.
+		body: tableMapperValues(sourceData, ['owner', 'time', 'side', 'rating', 'style']),
+		// Optional: The data returned when interactive is enabled and a row is clicked.
+		meta: tableMapperValues(sourceData, ['id', 'owner', 'time', 'side', 'rating', 'style']),
+		// Optional: A list of footer labels.
+		foot: ['Total', '', '<code class="code">5</code>']
+	};
+};
+
+type TableRowData = {
+	id: number;
+	owner: string;
+	time: Time;
+	style: Style;
+	side: string;
+	rating: string;
+};
+
+export const setRooms = (rooms: Room[]): TableRowData[] => {
+	return rooms.map((room) => {
+		return {
+			id: room.id,
+			owner: room.owner.username,
+			time: room.time,
+			style: room.style,
+			side: 'random',
+			rating: '??'
+		};
+	});
 };
 
 type Time =
@@ -32,17 +68,10 @@ export type Room = {
 	side: Side;
 };
 
-export const RoomsState = {
-	rooms: []
+export const addRoom = (room: Room) => {
+	roomsStore.update((n) => [...n, room]);
 };
 
-export function createRooms() {
-	const { subscribe, update } = writable<Room[]>(RoomsState.rooms);
-
-	return {
-		subscribe,
-		update,
-		add: (room: Room) => update((n) => [...n, room]),
-		remove: (id: number) => update((n) => n.filter((room) => room.id !== id))
-	};
-}
+export const removeRoom = (id: number) => {
+	roomsStore.update((n) => n.filter((room) => room.id !== id));
+};
