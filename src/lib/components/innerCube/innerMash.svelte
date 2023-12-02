@@ -17,6 +17,7 @@
 <T.Mesh key={i + ',' + j + ',' + k} position={[i * cubeSize, j * cubeSize, k * cubeSize]}>
 	<T.LineSegments>
 		<T.EdgesGeometry args={[new BoxGeometry(cubeSize, cubeSize, cubeSize)]} />
+
 		<CubeStatus {innerCubeSize} pos={[i, j, k]} />
 	</T.LineSegments>
 

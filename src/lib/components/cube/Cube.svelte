@@ -53,6 +53,7 @@
 			{/each}
 		{/each}
 	{/each}
+
 	<GridDivider position={[1.31, 1.31, 1.31]} />
 	<T.LineSegments position={[1.31, 1.31, 1.31]}>
 		<T.EdgesGeometry args={[new BoxGeometry(3, 3, 3)]} />

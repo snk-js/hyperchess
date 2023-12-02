@@ -30,7 +30,7 @@
 <AppShell class="z-50">
 	<Header slot="header" />
 
-	<div class="">
+	<div>
 		<slot />
 	</div>
 	<Footer slot="footer" />
