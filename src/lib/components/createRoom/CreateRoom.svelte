@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import type { Room } from '$lib/store/rooms';
+	import { roomsStore, type Room } from '$lib/store/rooms';
 	import userStore from '$lib/store/user';
 	import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
 	import { get } from 'svelte/store';
@@ -18,13 +18,25 @@
 	let side = 'random';
 
 	const publish = async (payload: Room) => {
-		const currentUserId = get(userStore).id;
+		const userId = get(userStore).id;
+
+		const rooms = get(roomsStore);
+
+		if (rooms.find((room) => room.owner.id === userId)) {
+			userStore.update((user) => {
+				return {
+					...user,
+					playing: true
+				};
+			});
+			return;
+		}
 
 		const response = await fetch('api/publish', {
 			method: 'POST',
 			body: JSON.stringify({
 				topic: 'rooms',
-				message: JSON.stringify({ sender: currentUserId, payload, topic: 'rooms' })
+				message: JSON.stringify({ sender: userId, payload, topic: 'rooms' })
 			})
 		});
 

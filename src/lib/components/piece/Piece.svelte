@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Group } from 'three';
 	import { T, forwardEventHandlers } from '@threlte/core';
-	import { Center, useGltf } from '@threlte/extras';
+	import { Align, useGltf } from '@threlte/extras';
 	import { interactivity } from '@threlte/extras';
 	import type { Cell, PieceCoords } from '$lib/store/';
 	import { board, dummyCell } from '$lib/store/';
@@ -49,7 +49,7 @@
 	{#await gltf}
 		<slot name="fallback" />
 	{:then gltf}
-		<Center autoCenter={true}>
+		<Align autoCenter={true}>
 			<T.Group
 				rotation={(cell.side === 'black' && [0, 0, 3.15]) || [0, 0, 0]}
 				position={cell.side === 'black' ? [0, 5.5, 0] : [0, 1.8, 0]}
@@ -62,7 +62,7 @@
 					<Pieces {gltf} side={cell.side} piece={cell.piece} />
 				{/if}
 			</T.Group>
-		</Center>
+		</Align>
 	{:catch error}
 		<slot name="error" {error} />
 	{/await}

@@ -1,9 +1,9 @@
 import { redirect, type Actions, fail } from '@sveltejs/kit';
 import { PrismaClient } from '@prisma/client';
-import userStore, { userPlaceholder } from '$lib/store/user';
+import userStore, { userPlaceholder, type User } from '$lib/store/user';
 import type { PageServerLoad } from './$types';
 import { get } from 'svelte/store';
-import type { Room } from '$lib/store/rooms';
+import { roomsStore, type Room } from '$lib/store/rooms';
 import { getDigitsFromString } from '$lib/utils';
 
 const prisma = new PrismaClient();
@@ -33,14 +33,15 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 		throw redirect(302, '/login');
 	}
 
-	const userData = {
+	const userData: User = {
 		id: user.id,
 		name: user.name,
 		email: user.email || '',
 		username: user.username,
 		clientId: '',
 		connected: false,
-		wsUrl: ''
+		wsUrl: '',
+		playing: false
 	};
 
 	userStore.set(userData);
