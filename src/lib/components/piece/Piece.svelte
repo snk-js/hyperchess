@@ -49,7 +49,7 @@
 	{#await gltf}
 		<slot name="fallback" />
 	{:then gltf}
-		<Align autoCenter={true}>
+		<Align auto>
 			<T.Group
 				rotation={(cell.side === 'black' && [0, 0, 3.15]) || [0, 0, 0]}
 				position={cell.side === 'black' ? [0, 5.5, 0] : [0, 1.8, 0]}

@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { roomsStore, type Room } from '$lib/store/rooms';
-	import userStore from '$lib/store/user';
-	import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
-	import { get } from 'svelte/store';
+	import { createRoomSubmit } from '$lib/async/websockets/publish/actions';
+	import { errors } from '$lib/errorMessages';
+	import { isLoading } from '$lib/store/loading';
+	import { RadioGroup, RadioItem, type ToastSettings } from '@skeletonlabs/skeleton';
+	import { getToastStore } from '@skeletonlabs/skeleton';
+
+	const toastStore = getToastStore();
 
 	// import {
 	// 	Autocomplete,
@@ -17,30 +20,20 @@
 	let gameStyle = 'match';
 	let side = 'random';
 
-	const publish = async (payload: Room) => {
-		const userId = get(userStore).id;
-
-		const rooms = get(roomsStore);
-
-		if (rooms.find((room) => room.owner.id === userId)) {
-			userStore.update((user) => {
-				return {
-					...user,
-					playing: true
-				};
-			});
-			return;
-		}
-
-		const response = await fetch('api/publish', {
-			method: 'POST',
-			body: JSON.stringify({
-				topic: 'rooms',
-				message: JSON.stringify({ sender: userId, payload, topic: 'rooms' })
-			})
-		});
-
-		console.log(await response.json());
+	const createRoomAction = async ({ formData }: { formData: FormData }) => {
+		isLoading.set(true);
+		const result = await createRoomSubmit(
+			formData,
+			{
+				timeSelect,
+				privacy,
+				gameStyle,
+				side
+			},
+			toastStore
+		);
+		isLoading.set(false);
+		return result;
 	};
 
 	// const timeStrategies: AutocompleteOption<string>[] = [
@@ -67,22 +60,7 @@
 
 <div class="glass p-4 text-green-200 font-bold">
 	<div class="asdasd">
-		<form
-			method="post"
-			use:enhance={({ formData }) => {
-				formData.set('time', timeSelect);
-				formData.set('privacy', privacy);
-				formData.set('gameStyle', gameStyle);
-				formData.set('side', side);
-				return async ({ result }) => {
-					if (result?.data?.roomValues) {
-						const { roomValues } = result.data;
-						console.log(roomValues);
-						await publish(roomValues);
-					}
-				};
-			}}
-		>
+		<form method="post" use:enhance={createRoomAction}>
 			<div class="my-3">
 				<label class="label" for="name">
 					<span> match name </span>

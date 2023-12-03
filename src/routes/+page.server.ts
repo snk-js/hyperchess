@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import userStore, { userPlaceholder, type User } from '$lib/store/user';
 import type { PageServerLoad } from './$types';
 import { get } from 'svelte/store';
-import { roomsStore, type Room } from '$lib/store/rooms';
+import type { Room } from '$lib/store/rooms';
 import { getDigitsFromString } from '$lib/utils';
 
 const prisma = new PrismaClient();

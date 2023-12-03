@@ -1,5 +1,5 @@
 <script>
-	import userStore from '$lib/store/user';
+	import userStore, { userPlaceholder } from '$lib/store/user';
 	import { Avatar } from '@skeletonlabs/skeleton';
 	import { goto } from '$app/navigation';
 
@@ -16,7 +16,7 @@
 
 		logoutResponse.json().then((data) => {
 			if (data.message === 'success') {
-				userStore.set({ username: '' });
+				userStore.set(userPlaceholder);
 				console.log('going login');
 				goto('/login');
 			}
@@ -24,8 +24,8 @@
 	};
 </script>
 
-<header class="glass m-4 h-16 flex items-center flex-row-reverse">
-	<div class="flex justify-end h-10">
+<header class="glass m-4 h-[3rem] p-1 flex items-center flex-row-reverse">
+	<div class="flex justify-end h-[95%]">
 		<button type="button" class="btn variant-ghost-tertiary font-bold text-white">
 			{username}
 		</button>

@@ -2,6 +2,7 @@
 	import { decreaseOffsetY, increaseOffsetY } from '$lib/store/camera';
 	import userStore from '$lib/store/user';
 	import Table from './Table/Table.svelte';
+	import BorderWrapper from './borderWrapper/BorderWrapper.svelte';
 	import CreateRoom from './createRoom/CreateRoom.svelte';
 
 	/** @param {KeyboardEvent} event */
@@ -35,14 +36,13 @@
 
 {#if !playing}
 	<div class="black-glass flex gap-10 p-10">
-		<div class="bg-pink p-3 border-4 divide-x-4 border-cyan-400 divide-green-300 rounded-lg">
-			<h1 class="h1 text-[2rem] gradient font-bold my-3">Rooms</h1>
+		<BorderWrapper title="Rooms">
 			<Table />
-		</div>
-		<div class="bg-pink p-3 border-4 border-cyan-400 divide-x-4 divide-green-300 rounded-lg">
-			<h1 class="h1 text-[2rem] gradient font-bold my-3">Create a room</h1>
+		</BorderWrapper>
+
+		<BorderWrapper title="Create a Room">
 			<CreateRoom />
-		</div>
+		</BorderWrapper>
 	</div>
 {/if}
 
