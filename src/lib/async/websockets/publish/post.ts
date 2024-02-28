@@ -1,14 +1,10 @@
 import { errors } from '$lib/errorMessages';
-import { roomsStore, type Room } from '$lib/store/rooms';
+import type { Room } from '$lib/store/rooms';
 import userStore from '$lib/store/user';
 import { get } from 'svelte/store';
 
 export const publish = async (payload: Room) => {
 	const userId = get(userStore).id;
-	const rooms = get(roomsStore);
-	if (rooms.find((room) => room.owner.id === userId)) {
-		return errors.rooms.publish.alreadyCreated;
-	}
 
 	try {
 		const response = await fetch('api/publish', {

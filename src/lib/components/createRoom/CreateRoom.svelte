@@ -1,14 +1,10 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { createRoomSubmit } from '$lib/async/websockets/publish/actions';
-	import { errors } from '$lib/errorMessages';
 	import { isLoading } from '$lib/store/loading';
 	import userStore from '$lib/store/user';
-	import { RadioGroup, RadioItem, type ToastSettings } from '@skeletonlabs/skeleton';
-	import { getToastStore } from '@skeletonlabs/skeleton';
+	import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
 	import { get } from 'svelte/store';
-
-	const toastStore = getToastStore();
 
 	// import {
 	// 	Autocomplete,
@@ -34,10 +30,10 @@
 				gameStyle,
 				side
 			},
-			toastStore,
 			userPayload
 		);
 		isLoading.set(false);
+
 		return result;
 	};
 

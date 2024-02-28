@@ -9,6 +9,7 @@
 	import { board, boardUpdates } from '$lib/store';
 	import { updatedCells } from '$lib/store/cellStates';
 	import { get } from 'svelte/store';
+	import { onMount } from 'svelte';
 
 	const cubesPerDimension = 8;
 	const totalSize = 3;
@@ -19,6 +20,10 @@
 	const offsetYState = tweened(0, {
 		duration: 200,
 		easing: backInOut
+	});
+
+	onMount(() => {
+		console.log('cube mounted');
 	});
 
 	$: {

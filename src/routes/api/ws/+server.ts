@@ -15,7 +15,7 @@ export const POST = async ({ request }) => {
 
 	const result = await registerClient.json();
 
-	return new Response(JSON.stringify({ message: 'sucess', result: { ...result } }), {
+	return new Response(JSON.stringify({ message: 'success', result: { ...result } }), {
 		status: 201
 	});
 };

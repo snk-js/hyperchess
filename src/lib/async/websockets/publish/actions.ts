@@ -1,34 +1,46 @@
 import type { ActionResult } from '@sveltejs/kit';
 import { publish } from './post';
 import { errors } from '$lib/errorMessages';
-import type { ToastSettings, ToastStore } from '@skeletonlabs/skeleton';
+import { addErrorLog, errorStore } from '$lib/store/toast';
+import { get } from 'svelte/store';
+import userStore from '$lib/store/user';
+import { roomsStore } from '$lib/store/rooms';
 
-const callback = (res: { message: string } | string, toastStore: ToastStore) => {
-	if (typeof res === 'string' && res === errors.rooms.publish.alreadyCreated) {
-		const t: ToastSettings = {
-			message: errors.rooms.publish.alreadyCreated,
-			timeout: 5000,
-			background: 'variant-filled-warning'
-		};
-		toastStore.trigger(t);
-		return 'error';
+const errorHandler = (res: { message: string } | string) => {
+	const userId = get(userStore).id;
+	const rooms = get(roomsStore);
+	if (rooms.find((room) => room.owner.id === userId)) {
+		errorStore.update((logs) => {
+			if (logs.length > 4) {
+				logs.shift();
+			}
+			const newLogs = logs.slice();
+			newLogs.push({ message: errors.rooms.publish.alreadyCreated, type: 'error' });
+
+			return newLogs;
+		});
+		return errors.rooms.actions.failure;
 	}
-
 	if (typeof res === 'object' && res.message === 'success') {
-		const t: ToastSettings = {
-			message: 'room created',
-			timeout: 5000,
-			background: 'variant-filled-success'
-		};
-		toastStore.trigger(t);
-		return 'success';
+		if (!!get(userStore).playing === true) {
+			console.log('user is playing');
+			addErrorLog({ message: 'Room created successfully', type: 'success' }, errorStore);
+			console.log('Room created succesfully');
+			return;
+		} else {
+			console.log('user is not playing');
+			addErrorLog({ message: 'room not created by some reason', type: 'error' }, errorStore);
+			console.log('Room not created succesfully');
+			return;
+		}
 	}
+	console.log('something I dont know went wrong', res);
+	return;
 };
 
 export const createRoomSubmit = async (
 	formData: FormData,
 	formValues: Record<string, string>,
-	toastStore: ToastStore,
 	user: {
 		id: string;
 		username: string;
@@ -36,6 +48,7 @@ export const createRoomSubmit = async (
 ) => {
 	const { timeSelect, privacy, gameStyle, side } = formValues;
 	const { id, username } = user;
+
 	formData.set('time', timeSelect);
 	formData.set('privacy', privacy);
 	formData.set('gameStyle', gameStyle);
@@ -43,16 +56,13 @@ export const createRoomSubmit = async (
 	formData.set('userId', id);
 	formData.set('username', username);
 
-	console.log({ user });
 	return async ({ result }: { result: ActionResult }) => {
-		console.log({ result });
 		if (result.type === 'success') {
-			console.log({ result });
 			if (result?.data?.roomValues) {
-				console.log({ result });
 				const { roomValues } = result.data;
+
 				const publishResult = await publish(roomValues);
-				callback(publishResult, toastStore);
+				errorHandler(publishResult);
 				return publishResult;
 			}
 		} else {

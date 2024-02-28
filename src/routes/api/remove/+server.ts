@@ -18,7 +18,7 @@ export const POST = async ({ request }) => {
 	console.log(result);
 
 	if (result.status === 200) {
-		return new Response(JSON.stringify({ message: 'sucess' }), {
+		return new Response(JSON.stringify({ message: 'success' }), {
 			status: 201
 		});
 	} else {

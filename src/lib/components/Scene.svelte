@@ -30,6 +30,7 @@
 
 	let playing = false;
 	userStore.subscribe((user) => {
+		console.log('isplaying', user.playing);
 		playing = user.playing;
 	});
 
