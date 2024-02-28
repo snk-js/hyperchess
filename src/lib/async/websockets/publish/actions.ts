@@ -6,6 +6,12 @@ import { get } from 'svelte/store';
 import userStore from '$lib/store/user';
 import { roomsStore } from '$lib/store/rooms';
 
+// um programador ou desenvolvedor, que seja, são só pessoas que sabem ordenar bem os acontecimentos. E porque eu digo ordenar? porque
+// no codigo é automatico começar a entender a ordem de determinado acontecimento ou micro comportamento nas regras de negócio.
+
+// a programmer or developer, they are just people who know how to order events well. And why do I say order? because
+// in the code it is automatic to start understanding the order of a certain event or micro behavior in the business rules.
+
 const errorHandler = (res: { message: string } | string) => {
 	const userId = get(userStore).id;
 	const rooms = get(roomsStore);
