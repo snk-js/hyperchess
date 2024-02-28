@@ -5,6 +5,7 @@ import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const session = await locals.auth.validate();
+	console.log('signup load page server', { session });
 	if (session) throw redirect(302, '/');
 	return {};
 };
@@ -45,6 +46,7 @@ export const actions: Actions = {
 					email
 				}
 			});
+			console.log('new user', { user });
 			const session = await auth.createSession({
 				userId: user.userId,
 				attributes: {}
@@ -58,6 +60,7 @@ export const actions: Actions = {
 					message: 'Username already taken'
 				});
 			}
+			console.log('An unknown error occurred', { e });
 			return fail(500, {
 				message: 'An unknown error occurred'
 			});

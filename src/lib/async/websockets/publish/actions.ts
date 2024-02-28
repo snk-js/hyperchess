@@ -24,19 +24,32 @@ const callback = (res: { message: string } | string, toastStore: ToastStore) => 
 		return 'success';
 	}
 };
+
 export const createRoomSubmit = async (
 	formData: FormData,
 	formValues: Record<string, string>,
-	toastStore: ToastStore
+	toastStore: ToastStore,
+	user: {
+		id: string;
+		username: string;
+	}
 ) => {
 	const { timeSelect, privacy, gameStyle, side } = formValues;
+	const { id, username } = user;
 	formData.set('time', timeSelect);
 	formData.set('privacy', privacy);
 	formData.set('gameStyle', gameStyle);
 	formData.set('side', side);
+	formData.set('userId', id);
+	formData.set('username', username);
+
+	console.log({ user });
 	return async ({ result }: { result: ActionResult }) => {
+		console.log({ result });
 		if (result.type === 'success') {
+			console.log({ result });
 			if (result?.data?.roomValues) {
+				console.log({ result });
 				const { roomValues } = result.data;
 				const publishResult = await publish(roomValues);
 				callback(publishResult, toastStore);

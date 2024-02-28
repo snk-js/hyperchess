@@ -3,8 +3,10 @@
 	import { createRoomSubmit } from '$lib/async/websockets/publish/actions';
 	import { errors } from '$lib/errorMessages';
 	import { isLoading } from '$lib/store/loading';
+	import userStore from '$lib/store/user';
 	import { RadioGroup, RadioItem, type ToastSettings } from '@skeletonlabs/skeleton';
 	import { getToastStore } from '@skeletonlabs/skeleton';
+	import { get } from 'svelte/store';
 
 	const toastStore = getToastStore();
 
@@ -21,6 +23,8 @@
 	let side = 'random';
 
 	const createRoomAction = async ({ formData }: { formData: FormData }) => {
+		const { id, username } = get(userStore);
+		const userPayload = { id: id || '', username: username || '' };
 		isLoading.set(true);
 		const result = await createRoomSubmit(
 			formData,
@@ -30,7 +34,8 @@
 				gameStyle,
 				side
 			},
-			toastStore
+			toastStore,
+			userPayload
 		);
 		isLoading.set(false);
 		return result;

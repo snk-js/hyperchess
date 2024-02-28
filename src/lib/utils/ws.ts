@@ -1,13 +1,19 @@
-import { addRoom, roomsStore } from '$lib/store/rooms';
+import { addRoom } from '$lib/store/rooms';
 import userStore from '$lib/store/user';
 import type { User } from 'lucia';
-import { get } from 'svelte/store';
 
-export const registerClient = async (userId: number, currentUser: User, disconect: () => void) => {
+export const registerClient = async (
+	userId: number,
+	currentUser: User,
+	disconect: () => void,
+	url: string
+) => {
 	const response = await fetch('api/ws', {
 		method: 'POST',
 		body: JSON.stringify({ user_id: userId, topic: 'rooms' })
 	});
+
+	console.log({ url });
 
 	const { result } = await response.json();
 

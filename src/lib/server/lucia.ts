@@ -3,8 +3,13 @@ import { dev } from '$app/environment';
 import { lucia } from 'lucia';
 import { prisma } from '@lucia-auth/adapter-prisma';
 import { PrismaClient } from '@prisma/client';
+import { env } from '$env/dynamic/private';
 
-const client = new PrismaClient();
+const client = global.__client || new PrismaClient();
+
+if (env.NODE_ENV === 'development') {
+	global.__client = client;
+}
 
 export const auth = lucia({
 	adapter: prisma(client, {
@@ -20,5 +25,8 @@ export const auth = lucia({
 			username: userData.username,
 			name: userData.name
 		};
+	},
+	experimental: {
+		debugMode: true
 	}
 });

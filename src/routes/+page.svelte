@@ -19,7 +19,12 @@
 		if (disconnected) {
 			const currentUser = get(userStore);
 			// try reconnect
-			registerClient(getDigitsFromString(currentUser.id as string), currentUser, disconect);
+			registerClient(
+				getDigitsFromString(currentUser.id as string),
+				currentUser,
+				disconect,
+				data?.url || ''
+			);
 			disconnected = false;
 		}
 	}

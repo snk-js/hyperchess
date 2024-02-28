@@ -3,6 +3,8 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
+		"serve": "node build/index.js",
+		"dev-server": "pm2 start build/index.js",
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
@@ -55,6 +57,7 @@
 		"@prisma/client": "^5.5.2",
 		"@threlte/theatre": "^2.1.4",
 		"@types/lodash": "^4.14.197",
+		"cors": "^2.8.5",
 		"dotenv": "^16.3.1",
 		"express": "^4.17.1",
 		"lodash": "^4.17.21",
