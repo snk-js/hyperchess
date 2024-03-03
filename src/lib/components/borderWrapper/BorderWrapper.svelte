@@ -5,6 +5,11 @@
 	export let type = 'div';
 	export let accent = 'cyan';
 
+	import { createEventDispatcher } from 'svelte';
+	const dispatch = createEventDispatcher();
+
+	const goback = () => dispatch('goback');
+
 	const h1 = 'h1 p-2 text-[2rem] gradient font-bold my-3 z-50';
 </script>
 
@@ -17,13 +22,15 @@
 	${type === 'button' ? 'hover:bg-slate-950 hover:cursor-pointer bg-opacity-25' : ''}
 	`}
 >
-	{#if center}
-		<div class="flex justify-center items-center">
-			<slot />
+	<button on:click={goback} class="relative z-50 w-full">
+		{#if center}
+			<div class="flex justify-center items-center">
+				<h1 class={h1}>{title}</h1>
+				<slot />
+			</div>
+		{:else}
 			<h1 class={h1}>{title}</h1>
-		</div>
-	{:else}
-		<slot />
-		<h1 class={h1}>{title}</h1>
-	{/if}
+			<slot />
+		{/if}
+	</button>
 </div>

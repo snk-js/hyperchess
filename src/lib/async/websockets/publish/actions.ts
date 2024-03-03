@@ -15,6 +15,7 @@ import { roomsStore } from '$lib/store/rooms';
 const errorHandler = (res: { message: string } | string) => {
 	const userId = get(userStore).id;
 	const rooms = get(roomsStore);
+	console.log(rooms, userId);
 	if (rooms.find((room) => room.owner.id === userId)) {
 		addErrorLog({ message: errors.rooms.publish.alreadyCreated, type: 'error' });
 		return;

@@ -18,7 +18,6 @@ export const actions: Actions = {
 	default: async ({ request, locals, cookies }) => {
 		locals.auth.invalidate();
 		const formData = await request.formData();
-		console.log({ request: request.client });
 		const username = formData.get('username');
 		const password = formData.get('password');
 		// basic check

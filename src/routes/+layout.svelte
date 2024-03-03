@@ -57,6 +57,13 @@
 			unsubscribe();
 		};
 	});
+
+	const goback = () => {
+		isBrowser && localStorage.setItem('playing', 'false');
+		userStore.update((user) => {
+			return { ...user, playing: false };
+		});
+	};
 </script>
 
 <div class="absolute w-full h-full z-0 bg-blue-gray-600">
@@ -79,7 +86,7 @@
 			<BorderWrapper title="waiting player" center>
 				<SpinLine size="70" color="#ff0fb3" unit="px" duration="10s" />
 			</BorderWrapper>
-			<BorderWrapper title="go back" shrink type="button" accent="red-rose" />
+			<BorderWrapper title="go back" shrink type="button" accent="red-rose" on:goback={goback} />
 		</div>
 	{/if}
 
