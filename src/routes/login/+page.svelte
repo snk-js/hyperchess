@@ -9,7 +9,7 @@
 
 <AuthWrapper>
 	<div class="w-full glass flex justify-center">
-		<div class="relative max-w-lg">
+		<div class="relative max-w-sm">
 			<h1 class="h1 my-3">
 				<span
 					class="bg-gradient-to-br from-green-500 to-purple-400 bg-clip-text text-transparent box-decoration-clone"

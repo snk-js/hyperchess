@@ -1,7 +1,7 @@
 import type { ActionResult } from '@sveltejs/kit';
 import { publish } from './post';
 import { errors } from '$lib/errorMessages';
-import { addErrorLog, errorStore } from '$lib/store/toast';
+import { addErrorLog } from '$lib/store/toast';
 import { get } from 'svelte/store';
 import userStore from '$lib/store/user';
 import { roomsStore } from '$lib/store/rooms';
@@ -16,26 +16,20 @@ const errorHandler = (res: { message: string } | string) => {
 	const userId = get(userStore).id;
 	const rooms = get(roomsStore);
 	if (rooms.find((room) => room.owner.id === userId)) {
-		errorStore.update((logs) => {
-			if (logs.length > 4) {
-				logs.shift();
-			}
-			const newLogs = logs.slice();
-			newLogs.push({ message: errors.rooms.publish.alreadyCreated, type: 'error' });
-
-			return newLogs;
-		});
-		return errors.rooms.actions.failure;
+		addErrorLog({ message: errors.rooms.publish.alreadyCreated, type: 'error' });
+		return;
 	}
 	if (typeof res === 'object' && res.message === 'success') {
 		if (!!get(userStore).playing === true) {
 			console.log('user is playing');
-			addErrorLog({ message: 'Room created successfully', type: 'success' }, errorStore);
+			addErrorLog({ message: 'Room created successfully', type: 'success' });
 			console.log('Room created succesfully');
 			return;
+		} else if (res.message !== 'success') {
+			console.log('res.message not success');
 		} else {
 			console.log('user is not playing');
-			addErrorLog({ message: 'room not created by some reason', type: 'error' }, errorStore);
+			addErrorLog({ message: 'room not created by some reason', type: 'error' });
 			console.log('Room not created succesfully');
 			return;
 		}

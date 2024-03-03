@@ -63,6 +63,7 @@
 		"lodash": "^4.17.21",
 		"lucia": "latest",
 		"postprocessing": "^6.33.0",
+		"uuid": "^9.0.1",
 		"zod": "^3.22.4"
 	}
 }

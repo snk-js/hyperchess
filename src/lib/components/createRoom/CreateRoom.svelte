@@ -6,13 +6,6 @@
 	import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
 	import { get } from 'svelte/store';
 
-	// import {
-	// 	Autocomplete,
-	// 	popup,
-	// 	type AutocompleteOption,
-	// 	type PopupSettings
-	// } from '@skeletonlabs/skeleton';
-
 	let timeSelect = 'unlimited';
 	let privacy = 'public';
 	let gameStyle = 'match';
@@ -22,41 +15,29 @@
 		const { id, username } = get(userStore);
 		const userPayload = { id: id || '', username: username || '' };
 		isLoading.set(true);
-		const result = await createRoomSubmit(
-			formData,
-			{
-				timeSelect,
-				privacy,
-				gameStyle,
-				side
-			},
-			userPayload
-		);
+		const result = await new Promise((resolve) => {
+			createRoomSubmit(
+				formData,
+				{
+					timeSelect,
+					privacy,
+					gameStyle,
+					side
+				},
+				userPayload
+			).then((result) => {
+				// Delay the response by 1 second
+				setTimeout(() => {
+					isLoading.set(false);
+					resolve(result);
+				}, 1700); // 1000 milliseconds = 1 second
+			});
+		});
+
 		isLoading.set(false);
 
 		return result;
 	};
-
-	// const timeStrategies: AutocompleteOption<string>[] = [
-	// 	{ label: '5 min + 10s', value: '5+10', keywords: '5, 10' },
-	// 	{ label: 'unlimited', value: 'unlimited', keywords: '0' }
-	// ];
-
-	// function onFlavorSelection(event: CustomEvent<AutocompleteOption<string>>): void {
-	// 	timeSelect = event.detail.label;
-	// }
-
-	// let popupSettings: PopupSettings = {
-	// 	event: 'focus-click',
-	// 	target: 'popupAutocomplete',
-	// 	placement: 'bottom',
-	// 	state: (state) => {
-	// 		return {
-	// 			...state,
-	// 			visible: true
-	// 		};
-	// 	}
-	// };
 </script>
 
 <div class="glass p-4 text-green-200 font-bold">

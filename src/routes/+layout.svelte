@@ -6,6 +6,8 @@
 	import { Canvas } from '@threlte/core';
 	import Scene from '$lib/components/Scene.svelte';
 	import userStore from '$lib/store/user';
+	import { onMount } from 'svelte';
+
 	// skeleton initializations
 	import { SpinLine } from 'svelte-loading-spinners';
 	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
@@ -17,10 +19,43 @@
 	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 
 	let playing = false;
+	const isBrowser = typeof window !== 'undefined';
 
-	userStore.subscribe((user) => {
-		console.log('isPlaying', user.playing);
-		playing = user.playing;
+	onMount(() => {
+		const unsubscribe = userStore.subscribe((user) => {
+			if (user.playing !== playing) {
+				playing = user.playing;
+				if (user.playing) {
+					console.log('user is playing');
+					isBrowser && localStorage.setItem('playing', 'true');
+				}
+			}
+
+			if (!user.playing) {
+				const isPlaying = isBrowser && localStorage.getItem('playing');
+				if (isPlaying === 'true' && user.id !== '' && user.username !== '' && user.connected) {
+					if (!playing) {
+						// Add this check to avoid infinite loop
+						console.log('here the user is not disconnected and is still playing');
+						userStore.update((u) => {
+							u.playing = true;
+							return u;
+						});
+					}
+				} else if (playing) {
+					// This condition ensures logging and updating only if necessary
+					console.log('here the user is playing is disconnected or not playing anymore');
+					userStore.update((u) => {
+						u.playing = false;
+						return u;
+					});
+				}
+			}
+		});
+
+		return () => {
+			unsubscribe();
+		};
 	});
 </script>
 
@@ -44,6 +79,7 @@
 			<BorderWrapper title="waiting player" center>
 				<SpinLine size="70" color="#ff0fb3" unit="px" duration="10s" />
 			</BorderWrapper>
+			<BorderWrapper title="go back" shrink type="button" accent="red-rose" />
 		</div>
 	{/if}
 

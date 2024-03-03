@@ -1,7 +1,9 @@
 import { auth } from '$lib/server/lucia';
 import { LuciaError } from 'lucia';
 import { fail, redirect } from '@sveltejs/kit';
-
+import { v4 as uuidv4 } from 'uuid';
+// Generate a unique sessionId
+const sessionId = uuidv4();
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -34,11 +36,11 @@ export const actions: Actions = {
 			// find user by key
 			// and validate password
 			const key = await auth.useKey('username', username.toLowerCase(), password);
-			console.log({ key });
+
 			const session = await auth.createSession({
 				userId: key.userId,
 				attributes: {},
-				sessionId: key.userId
+				sessionId: sessionId // Use the generated unique sessionId
 			});
 
 			locals.auth.setSession(session); // set session cookie
@@ -63,7 +65,7 @@ export const actions: Actions = {
 				});
 			}
 			return fail(500, {
-				message: 'An unknown error occurred'
+				message: 'An unknown error occurred --\n' + e
 			});
 		}
 
