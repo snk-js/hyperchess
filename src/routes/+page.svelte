@@ -6,10 +6,12 @@
 	import { get } from 'svelte/store';
 	import { getDigitsFromString } from '$lib/utils';
 	import { connectWs, registerClient } from '$lib/utils/ws';
-	import { errorStore } from '$lib/store/toast';
+	import { pushNotification, notificationStore } from '$lib/store/toast';
 	import { getToastStore, type ToastSettings } from '@skeletonlabs/skeleton';
 	import { isLoading } from '$lib/store/loading';
 	import Spinner from '$lib/components/loading/Spinner.svelte';
+	import { roomsStore, type Room } from '$lib/store/rooms';
+	import { redirect } from '@sveltejs/kit';
 
 	let loading = false;
 
@@ -17,15 +19,31 @@
 		loading = value;
 	});
 
+	// listen to the user id and if the user id doesnt exist, send it to login
+	$: {
+		const currentUser = get(userStore);
+		console.log({ currentUser });
+		// if (!currentUser.id) {
+		// 	userStore.update((_) => {
+		// 		return userPlaceholder;
+		// 	});
+		// 	throw redirect(302, '/login');
+		// }
+	}
+
+	// listen to the page data
+
 	export let data: PageData;
-	let disconnected = false;
+	let disconnected = true;
 
 	const disconect = () => {
 		disconnected = true;
 	};
 
+	// if the user
+
 	const toastStore = getToastStore();
-	errorStore.subscribe((logs) => {
+	notificationStore.subscribe((logs) => {
 		const lastToast = logs.pop();
 		if (lastToast && lastToast.type === 'error') {
 			const t: ToastSettings = {
@@ -46,20 +64,21 @@
 		return 'error';
 	});
 
-	$: {
-		console.log('reconnecting');
-		if (disconnected) {
-			const currentUser = get(userStore);
-			// try reconnect
-			registerClient(
-				getDigitsFromString(currentUser.id as string),
-				currentUser,
-				disconect,
-				data?.url || ''
-			);
-			disconnected = false;
-		}
-	}
+	// $: {
+	// 	console.log('reconnecting');
+	// 	console.log({ disconnected });
+	// 	if (disconnected) {
+	// 		const currentUser = get(userStore);
+	// 		// try reconnect
+	// 		registerClient(
+	// 			getDigitsFromString(currentUser.id as string),
+	// 			currentUser,
+	// 			disconect,
+	// 			data?.url || ''
+	// 		);
+	// 		disconnected = false;
+	// 	}
+	// }
 
 	$: {
 		data?.user &&
@@ -71,12 +90,35 @@
 				};
 			});
 	}
-
 	onMount(() => {
+		console.log('on mount');
 		const currentUser = get(userStore);
-		const wsUrl = currentUser.wsUrl;
-		if (wsUrl) {
-			const ws = connectWs(wsUrl, disconect);
+		let ws: WebSocket | null = null;
+		// Ensure that this code runs only on the client side and currentUser has required properties
+		if (currentUser && currentUser.id && currentUser.wsUrl) {
+			registerClient(
+				getDigitsFromString(currentUser.id.toString()),
+				currentUser,
+				disconect,
+				data?.url || ''
+			)
+				.then((client) => {
+					console.log({ client });
+					ws = client;
+					console.log('WebSocket connected');
+					pushNotification({
+						message: 'WebSocket connected',
+						type: 'success'
+					});
+				})
+				.catch((e) => {
+					console.error('Failed to register client:', e);
+					// Optionally handle the error, e.g., show a notification
+					pushNotification({
+						message: 'Failed to register client to websockets server',
+						type: 'error'
+					});
+				});
 
 			userStore.set({
 				...currentUser,
@@ -84,8 +126,13 @@
 				ws
 			});
 		}
+
 		return () => {
-			currentUser.ws?.close();
+			// Cleanup logic remains the same
+			if (currentUser && currentUser.ws) {
+				currentUser.ws.close();
+				console.log('WebSocket disconnected');
+			}
 			userStore.set(userPlaceholder);
 		};
 	});

@@ -1,7 +1,7 @@
 import type { ActionResult } from '@sveltejs/kit';
 import { publish } from './post';
 import { errors } from '$lib/errorMessages';
-import { addErrorLog } from '$lib/store/toast';
+import { pushNotification } from '$lib/store/toast';
 import { get } from 'svelte/store';
 import userStore from '$lib/store/user';
 import { roomsStore } from '$lib/store/rooms';
@@ -13,24 +13,17 @@ import { roomsStore } from '$lib/store/rooms';
 // in the code it is automatic to start understanding the order of a certain event or micro behavior in the business rules.
 
 const errorHandler = (res: { message: string } | string) => {
-	const userId = get(userStore).id;
-	const rooms = get(roomsStore);
-	console.log(rooms, userId);
-	if (rooms.find((room) => room.owner.id === userId)) {
-		addErrorLog({ message: errors.rooms.publish.alreadyCreated, type: 'error' });
-		return;
-	}
 	if (typeof res === 'object' && res.message === 'success') {
-		if (!!get(userStore).playing === true) {
+		if (get(userStore).playing === true) {
 			console.log('user is playing');
-			addErrorLog({ message: 'Room created successfully', type: 'success' });
+			pushNotification({ message: 'Room created successfully', type: 'success' });
 			console.log('Room created succesfully');
 			return;
 		} else if (res.message !== 'success') {
 			console.log('res.message not success');
 		} else {
 			console.log('user is not playing');
-			addErrorLog({ message: 'room not created by some reason', type: 'error' });
+			pushNotification({ message: 'room not created by some reason', type: 'error' });
 			console.log('Room not created succesfully');
 			return;
 		}
@@ -63,11 +56,12 @@ export const createRoomSubmit = async (
 				const { roomValues } = result.data;
 
 				const publishResult = await publish(roomValues);
-				errorHandler(publishResult);
+
+				// errorHandler(publishResult);
 				return publishResult;
 			}
 		} else {
-			console.log('result type not success', result.type);
+			console.log('result type not success', result);
 			return errors.rooms.actions.failure;
 		}
 	};

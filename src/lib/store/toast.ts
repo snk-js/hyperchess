@@ -2,7 +2,7 @@
 import { writable, type Writable } from 'svelte/store';
 
 // Create a writable store to store error logs
-export const errorStore = writable<Array<ToastLog>>([]);
+export const notificationStore = writable<Array<ToastLog>>([]);
 
 export type ToastLog = {
 	message: string;
@@ -10,13 +10,13 @@ export type ToastLog = {
 };
 
 // Function to add error logs to the store
-export function addErrorLog(error: ToastLog) {
-	errorStore.update((logs) => {
+export function pushNotification(toastPayload: ToastLog) {
+	notificationStore.update((logs) => {
 		if (logs.length > 4) {
 			logs.shift();
 		}
 		const newLogs = logs.slice();
-		newLogs.push(error);
+		newLogs.push(toastPayload);
 
 		return newLogs;
 	});
@@ -24,5 +24,5 @@ export function addErrorLog(error: ToastLog) {
 
 // Function to clear error logs from the store
 export function clearErrorLogs() {
-	errorStore.set([]);
+	notificationStore.set([]);
 }

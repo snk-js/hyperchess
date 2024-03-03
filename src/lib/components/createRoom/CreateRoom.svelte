@@ -2,9 +2,12 @@
 	import { enhance } from '$app/forms';
 	import { createRoomSubmit } from '$lib/async/websockets/publish/actions';
 	import { isLoading } from '$lib/store/loading';
-	import userStore from '$lib/store/user';
 	import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
 	import { get } from 'svelte/store';
+	import userStore from '$lib/store/user';
+	import { roomsStore } from '$lib/store/rooms';
+	import { pushNotification } from '$lib/store/toast';
+	import { errors } from '$lib/errorMessages';
 
 	let timeSelect = 'unlimited';
 	let privacy = 'public';
@@ -14,6 +17,14 @@
 	const createRoomAction = async ({ formData }: { formData: FormData }) => {
 		const { id, username } = get(userStore);
 		const userPayload = { id: id || '', username: username || '' };
+		const userId = get(userStore).id;
+		const rooms = get(roomsStore);
+
+		if (rooms.find((room) => room.owner.id === userId)) {
+			pushNotification({ message: errors.rooms.publish.alreadyCreated, type: 'error' });
+			return;
+		}
+
 		isLoading.set(true);
 		const result = await new Promise((resolve) => {
 			createRoomSubmit(
@@ -26,11 +37,10 @@
 				},
 				userPayload
 			).then((result) => {
-				// Delay the response by 1 second
 				setTimeout(() => {
 					isLoading.set(false);
 					resolve(result);
-				}, 1700); // 1000 milliseconds = 1 second
+				}, 1700);
 			});
 		});
 

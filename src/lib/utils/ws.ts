@@ -1,6 +1,8 @@
-import { addRoom } from '$lib/store/rooms';
+import { addRoom, roomsStore, type Room } from '$lib/store/rooms';
+import { pushNotification } from '$lib/store/toast';
 import userStore from '$lib/store/user';
 import type { User } from 'lucia';
+import { get } from 'svelte/store';
 
 export const registerClient = async (
 	userId: number,
@@ -13,23 +15,38 @@ export const registerClient = async (
 		body: JSON.stringify({ user_id: userId, topic: 'rooms' })
 	});
 
-	console.log({ url });
-
 	const { result } = await response.json();
+
+	console.log({ result });
+	let _ws = null;
 
 	if (result?.url) {
 		const ws = connectWs(result.url, disconect);
 
+		_ws = ws;
+
 		ws.onmessage = (event) => {
+			console.log('message received');
 			const message = JSON.parse(event.data);
 			if (message.topic === 'rooms') {
-				addRoom(message.payload);
-				userStore.update((user) => {
-					return {
-						...user,
-						playing: true
-					};
-				});
+				console.log({ message }, get(userStore));
+
+				// check if there is existing room, not add if exists
+
+				const rooms = get(roomsStore);
+
+				if (!rooms.find((room) => room.id === message.payload.id)) {
+					addRoom(message.payload);
+				}
+
+				if (message?.sender === get(userStore).id) {
+					userStore.update((user) => {
+						return {
+							...user,
+							playing: true
+						};
+					});
+				}
 			}
 		};
 		userStore.set({
@@ -37,15 +54,8 @@ export const registerClient = async (
 			connected: true,
 			ws
 		});
-
-		userStore.update((user) => {
-			return {
-				...user,
-				connected: true,
-				ws
-			};
-		});
 	}
+	return _ws;
 };
 
 export const connectWs = (url: string, disconect: () => void) => {
@@ -54,14 +64,17 @@ export const connectWs = (url: string, disconect: () => void) => {
 	ws.onopen = () => {
 		sessionStorage.setItem('wsConnected', 'true');
 		console.log('connected');
+		pushNotification({ message: 'listening broadcast updates', type: 'success' });
 	};
 	ws.onclose = () => {
 		sessionStorage.removeItem('wsConnected');
 		console.log('disconnected');
+		pushNotification({ message: 'disconnected from websockets server', type: 'error' });
 		disconect();
 	};
 	ws.onerror = (err) => {
 		console.error(err);
+		pushNotification({ message: 'unexpected error connecting to websocket URL', type: 'error' });
 	};
 	return ws;
 };

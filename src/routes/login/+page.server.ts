@@ -3,13 +3,13 @@ import { LuciaError } from 'lucia';
 import { fail, redirect } from '@sveltejs/kit';
 import { v4 as uuidv4 } from 'uuid';
 // Generate a unique sessionId
-const sessionId = uuidv4();
+
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	console.log('localsLoginPageload', { localsLoginPageload: locals.auth });
 	const session = await locals.auth.validate();
-	console.log(session);
+	console.log({ session });
 	if (session) throw redirect(302, '/');
 	return {};
 };
@@ -32,9 +32,12 @@ export const actions: Actions = {
 			});
 		}
 		try {
+			const sessionId = uuidv4();
 			// find user by key
 			// and validate password
 			const key = await auth.useKey('username', username.toLowerCase(), password);
+
+			console.log({ key });
 
 			const session = await auth.createSession({
 				userId: key.userId,
@@ -53,6 +56,7 @@ export const actions: Actions = {
 				maxAge: 60 * 60 * 24 * 30
 			});
 		} catch (e) {
+			console.log({ e });
 			if (
 				e instanceof LuciaError &&
 				(e.message === 'AUTH_INVALID_KEY_ID' || e.message === 'AUTH_INVALID_PASSWORD')
