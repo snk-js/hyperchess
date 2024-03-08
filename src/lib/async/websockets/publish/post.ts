@@ -3,15 +3,17 @@ import type { Room } from '$lib/store/rooms';
 import userStore from '$lib/store/user';
 import { get } from 'svelte/store';
 
-export const publish = async (payload: Room) => {
+type TOPICS = 'rooms' | 'matches';
+
+export const publish = async (payload: Room, topic: TOPICS) => {
 	const userId = get(userStore).id;
 
 	try {
 		const response = await fetch('api/publish', {
 			method: 'POST',
 			body: JSON.stringify({
-				topic: 'rooms',
-				message: JSON.stringify({ sender: userId, payload, topic: 'rooms' })
+				topic: topic,
+				message: JSON.stringify({ sender: userId, payload, topic })
 			})
 		});
 
