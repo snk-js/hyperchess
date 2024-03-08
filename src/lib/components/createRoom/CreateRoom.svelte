@@ -15,8 +15,8 @@
 	let side = 'random';
 
 	const createRoomAction = async ({ formData }: { formData: FormData }) => {
-		const { id, username } = get(userStore);
-		const userPayload = { id: id || '', username: username || '' };
+		const { id, username, rating } = get(userStore);
+		const userPayload = { id: id || '', username: username || '', rating: rating || 0 };
 		const userId = get(userStore).id;
 		const rooms = get(roomsStore);
 

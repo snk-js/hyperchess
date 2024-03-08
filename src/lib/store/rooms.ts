@@ -7,6 +7,7 @@ export const roomsStore = writable<Room[]>([]);
 type RoomUser = {
 	id: string;
 	username: string;
+	rating: number;
 };
 
 export const updateTableData = (sourceData: TableRowData[]) => {
@@ -16,7 +17,16 @@ export const updateTableData = (sourceData: TableRowData[]) => {
 		// The data visibly shown in your table body UI.
 		body: tableMapperValues(sourceData, ['owner', 'time', 'side', 'rating', 'style']),
 		// Optional: The data returned when interactive is enabled and a row is clicked.
-		meta: tableMapperValues(sourceData, ['id', 'owner', 'time', 'side', 'rating', 'style']),
+		meta: tableMapperValues(sourceData, [
+			'id',
+			'owner',
+			'time',
+			'side',
+			'rating',
+			'style',
+			'ownerId',
+			'privacy'
+		]),
 		// Optional: A list of footer labels.
 		foot: ['Total', '', '<code class="code">5</code>']
 	};
@@ -28,7 +38,9 @@ type TableRowData = {
 	time: Time;
 	style: Style;
 	side: string;
-	rating: string;
+	rating: number;
+	ownerId: string;
+	privacy: string;
 };
 
 export const setRooms = (rooms: Room[]): TableRowData[] => {
@@ -38,8 +50,10 @@ export const setRooms = (rooms: Room[]): TableRowData[] => {
 			owner: room.owner.username,
 			time: room.time,
 			style: room.style,
-			side: 'random',
-			rating: '??'
+			side: room.side || 'random',
+			rating: room.owner.rating,
+			ownerId: room.owner.id,
+			privacy: room.privacy === 'private' ? 'private' : 'public'
 		};
 	});
 };
@@ -66,6 +80,8 @@ export type Room = {
 	type: RoomType;
 	style: Style;
 	side: Side;
+	rating: number;
+	privacy: string;
 };
 
 export const addRoom = (room: Room) => {

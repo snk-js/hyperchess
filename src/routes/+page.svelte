@@ -140,7 +140,7 @@
 
 {#if loading}
 	<div class="absolute left-0 w-full h-full z-50">
-		<div class="flex glass justify-center w-full h-full items-stretch">
+		<div class="flex glass justify-center w-full h-full items-center">
 			<Spinner />
 		</div>
 	</div>

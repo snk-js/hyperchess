@@ -38,10 +38,11 @@ export const createRoomSubmit = async (
 	user: {
 		id: string;
 		username: string;
+		rating: number;
 	}
 ) => {
 	const { timeSelect, privacy, gameStyle, side } = formValues;
-	const { id, username } = user;
+	const { id, username, rating } = user;
 
 	formData.set('time', timeSelect);
 	formData.set('privacy', privacy);
@@ -49,6 +50,7 @@ export const createRoomSubmit = async (
 	formData.set('side', side);
 	formData.set('userId', id);
 	formData.set('username', username);
+	formData.set('rating', rating.toString());
 
 	return async ({ result }: { result: ActionResult }) => {
 		if (result.type === 'success') {

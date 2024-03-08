@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '../app.postcss';
-	import { AppShell, Toast, type ToastSettings } from '@skeletonlabs/skeleton';
+	import { AppShell, Modal, Toast, type ToastSettings } from '@skeletonlabs/skeleton';
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import { Canvas } from '@threlte/core';
@@ -42,6 +42,7 @@
 	</Canvas>
 </div>
 
+<Modal />
 <Toast />
 
 <AppShell class="z-50">

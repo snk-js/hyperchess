@@ -10,6 +10,7 @@ export interface User {
 	wsUrl?: string;
 	ws?: WebSocket | null;
 	playing: boolean;
+	rating?: number;
 }
 
 export const userPlaceholder = {
@@ -21,7 +22,8 @@ export const userPlaceholder = {
 	connected: false,
 	wsUrl: '',
 	ws: null,
-	playing: false
+	playing: false,
+	rating: 0
 };
 
 const userStore = writable<User>(userPlaceholder);

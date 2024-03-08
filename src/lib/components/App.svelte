@@ -43,6 +43,10 @@
 		<BorderWrapper title="Create a Room">
 			<CreateRoom />
 		</BorderWrapper>
+
+		<BorderWrapper title="My Rooms">
+			<CreateRoom />
+		</BorderWrapper>
 	</div>
 {/if}
 
