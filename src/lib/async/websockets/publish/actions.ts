@@ -57,7 +57,7 @@ export const createRoomSubmit = async (
 			if (result?.data?.roomValues) {
 				const { roomValues } = result.data;
 
-				const publishResult = await publish(roomValues);
+				const publishResult = await publish(roomValues, 'ROOMS');
 
 				// errorHandler(publishResult);
 				return publishResult;

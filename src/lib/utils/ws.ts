@@ -4,15 +4,17 @@ import userStore from '$lib/store/user';
 import type { User } from 'lucia';
 import { get } from 'svelte/store';
 
+import type { TOPICS } from '$lib/async/websockets/types';
+
 export const registerClient = async (
 	userId: number,
 	currentUser: User,
 	disconect: () => void,
-	url: string
+	topic: TOPICS
 ) => {
 	const response = await fetch('api/ws', {
 		method: 'POST',
-		body: JSON.stringify({ user_id: userId, topic: 'rooms' })
+		body: JSON.stringify({ user_id: userId, topic })
 	});
 
 	const { result } = await response.json();
@@ -28,7 +30,7 @@ export const registerClient = async (
 		ws.onmessage = (event) => {
 			console.log('message received');
 			const message = JSON.parse(event.data);
-			if (message.topic === 'rooms') {
+			if (message.topic === 'ROOMS') {
 				console.log({ message }, get(userStore));
 
 				// check if there is existing room, not add if exists

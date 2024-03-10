@@ -2,8 +2,7 @@ import { errors } from '$lib/errorMessages';
 import type { Room } from '$lib/store/rooms';
 import userStore from '$lib/store/user';
 import { get } from 'svelte/store';
-
-type TOPICS = 'rooms' | 'matches';
+import type { TOPICS } from '../types';
 
 export const publish = async (payload: Room, topic: TOPICS) => {
 	const userId = get(userStore).id;

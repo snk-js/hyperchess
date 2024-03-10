@@ -100,14 +100,14 @@
 				getDigitsFromString(currentUser.id.toString()),
 				currentUser,
 				disconect,
-				data?.url || ''
+				'ROOMS'
 			)
 				.then((client) => {
 					console.log({ client });
 					ws = client;
 					console.log('WebSocket connected');
 					pushNotification({
-						message: 'WebSocket connected',
+						message: 'Registered to listem to ROOMS',
 						type: 'success'
 					});
 				})
@@ -139,7 +139,7 @@
 </script>
 
 {#if loading}
-	<div class="absolute left-0 w-full h-full z-50">
+	<div class="absolute left-0 w-full h-full z-[1900]">
 		<div class="flex glass justify-center w-full h-full items-center">
 			<Spinner />
 		</div>

@@ -41,7 +41,7 @@ export const load: PageServerLoad = async ({ locals, fetch, request }) => {
 
 		const registerWsPayload = {
 			user_id: roomId,
-			topic: 'rooms'
+			topic: 'ROOMS'
 		};
 
 		const response = await fetch('api/ws', {
