@@ -1,36 +1,15 @@
 import type { ActionResult } from '@sveltejs/kit';
 import { publish } from './post';
 import { errors } from '$lib/errorMessages';
-import { pushNotification } from '$lib/store/toast';
-import { get } from 'svelte/store';
-import userStore from '$lib/store/user';
-import { roomsStore } from '$lib/store/rooms';
+
+import type { RoomPayload } from '$lib/store/rooms';
+import { registerClient } from '$lib/utils/ws';
 
 // um programador ou desenvolvedor, que seja, são só pessoas que sabem ordenar bem os acontecimentos. E porque eu digo ordenar? porque
 // no codigo é automatico começar a entender a ordem de determinado acontecimento ou micro comportamento nas regras de negócio.
 
 // a programmer or developer, they are just people who know how to order events well. And why do I say order? because
 // in the code it is automatic to start understanding the order of a certain event or micro behavior in the business rules.
-
-const errorHandler = (res: { message: string } | string) => {
-	if (typeof res === 'object' && res.message === 'success') {
-		if (get(userStore).playing === true) {
-			console.log('user is playing');
-			pushNotification({ message: 'Room created successfully', type: 'success' });
-			console.log('Room created succesfully');
-			return;
-		} else if (res.message !== 'success') {
-			console.log('res.message not success');
-		} else {
-			console.log('user is not playing');
-			pushNotification({ message: 'room not created by some reason', type: 'error' });
-			console.log('Room not created succesfully');
-			return;
-		}
-	}
-	console.log('something I dont know went wrong', res);
-	return;
-};
 
 export const createRoomSubmit = async (
 	formData: FormData,
@@ -57,7 +36,8 @@ export const createRoomSubmit = async (
 			if (result?.data?.roomValues) {
 				const { roomValues } = result.data;
 
-				const publishResult = await publish(roomValues, 'ROOMS');
+				const publishResult = await publish(roomValues as RoomPayload, 'ROOMS');
+				const registerMatch = await registerClient('ROOMS');
 
 				// errorHandler(publishResult);
 				return publishResult;

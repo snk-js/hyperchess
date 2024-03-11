@@ -1,66 +1,42 @@
-import { addRoom, roomsStore, type Room } from '$lib/store/rooms';
 import { pushNotification } from '$lib/store/toast';
-import userStore from '$lib/store/user';
-import type { User } from 'lucia';
-import { get } from 'svelte/store';
+import type { User } from '$lib/store/user';
 
 import type { TOPICS } from '$lib/async/websockets/types';
+import { getDigitsFromString } from '.';
 
 export const registerClient = async (
-	userId: number,
-	currentUser: User,
-	disconect: () => void,
-	topic: TOPICS
-) => {
-	const response = await fetch('api/ws', {
-		method: 'POST',
-		body: JSON.stringify({ user_id: userId, topic })
-	});
+	topic: TOPICS,
+	wsEventHanlder: (msg: MessageEvent) => void,
+	currentUser: User
+): Promise<WebSocket | void> => {
+	console.log('registering, user:');
+	if (currentUser.id) {
+		const user_id = getDigitsFromString(currentUser.id.toString());
 
-	const { result } = await response.json();
-
-	console.log({ result });
-	let _ws = null;
-
-	if (result?.url) {
-		const ws = connectWs(result.url, disconect);
-
-		_ws = ws;
-
-		ws.onmessage = (event) => {
-			console.log('message received');
-			const message = JSON.parse(event.data);
-			if (message.topic === 'ROOMS') {
-				console.log({ message }, get(userStore));
-
-				// check if there is existing room, not add if exists
-
-				const rooms = get(roomsStore);
-
-				if (!rooms.find((room) => room.id === message.payload.id)) {
-					addRoom(message.payload);
-				}
-
-				if (message?.sender === get(userStore).id) {
-					userStore.update((user) => {
-						return {
-							...user,
-							playing: true
-						};
-					});
-				}
-			}
-		};
-		userStore.set({
-			...currentUser,
-			connected: true,
-			ws
-		});
+		try {
+			const ws = await connectAndAddWsMsgListener(user_id, topic, wsEventHanlder);
+			return ws;
+		} catch (e) {
+			console.error(e);
+			pushNotification({ message: 'unexpected error connecting to websocket URL', type: 'error' });
+			throw new Error('unexpected error connecting to websocket URL');
+		}
+	} else {
+		pushNotification({ message: 'user not found', type: 'error' });
+		return;
 	}
-	return _ws;
 };
 
-export const connectWs = (url: string, disconect: () => void) => {
+export const getWsUrl = async (user_id: number, topic: TOPICS) => {
+	const response = await fetch('api/ws', {
+		method: 'POST',
+		body: JSON.stringify({ user_id, topic })
+	});
+	const { result } = await response.json();
+	return result?.url;
+};
+
+export const connectWs = (url: string) => {
 	const con = () => new WebSocket(url);
 	const ws = con();
 	ws.onopen = () => {
@@ -72,11 +48,45 @@ export const connectWs = (url: string, disconect: () => void) => {
 		sessionStorage.removeItem('wsConnected');
 		console.log('disconnected');
 		pushNotification({ message: 'disconnected from websockets server', type: 'error' });
-		disconect();
 	};
 	ws.onerror = (err) => {
 		console.error(err);
 		pushNotification({ message: 'unexpected error connecting to websocket URL', type: 'error' });
 	};
 	return ws;
+};
+
+const connectAndAddWsMsgListener = async (
+	user_id: number,
+	topic: string,
+	handler: (msg: MessageEvent) => void
+) => {
+	const url = await getWsUrl(user_id, topic);
+
+	if (url) {
+		const ws: WebSocket = connectWs(url);
+		if (ws) {
+			configWsMessage(ws, handler);
+			return ws;
+		} else {
+			pushNotification({ message: 'unexpected error getting websocket connection', type: 'error' });
+			throw new Error('unexpected error getting websocket URL');
+		}
+	} else {
+		pushNotification({ message: 'unexpected error getting websocket URL', type: 'error' });
+		throw new Error('unexpected error getting websocket URL');
+	}
+};
+
+const addWsEventListener = (ws: WebSocket, handler: (event: MessageEvent) => void) => {
+	ws.addEventListener('message', handler);
+};
+
+const configWsMessage = (ws: WebSocket, handler: (event: MessageEvent) => void) => {
+	try {
+		addWsEventListener(ws, handler);
+	} catch (e) {
+		pushNotification({ message: 'unexpected error adding event listener', type: 'error' });
+		console.error(e);
+	}
 };

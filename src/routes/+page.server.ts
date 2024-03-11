@@ -2,7 +2,7 @@ import { redirect, type Actions, fail } from '@sveltejs/kit';
 import { PrismaClient } from '@prisma/client';
 import type { User } from '$lib/store/user';
 import type { PageServerLoad } from './$types';
-import type { Room } from '$lib/store/rooms';
+import type { RoomPayload } from '$lib/store/rooms';
 import { getDigitsFromString } from '$lib/utils';
 
 const prisma = new PrismaClient();
@@ -30,7 +30,6 @@ export const load: PageServerLoad = async ({ locals, fetch, request }) => {
 		email: user.email || '',
 		username: user.username,
 		clientId: '',
-		connected: false,
 		wsUrl: '',
 		playing: false
 	};
@@ -70,12 +69,14 @@ export const actions: Actions = {
 	default: async ({ request, fetch }) => {
 		const formData = await request.formData();
 
-		const time = formData.get('time') as Room['time'];
-		const type = formData.get('privacy') as Room['type'];
-		const style = formData.get('gameStyle') as Room['style'];
-		const side = formData.get('side') as Room['side'];
+		const time = formData.get('time') as RoomPayload['time'];
+		const type = formData.get('privacy') as RoomPayload['type'];
+		const style = formData.get('gameStyle') as RoomPayload['style'];
+		const side = formData.get('side') as RoomPayload['side'];
 		const id = formData.get('userId') as string;
 		const username = formData.get('username') as string;
+		const rating = formData.get('rating') as string;
+		const privacy = formData.get('privacy') as string;
 
 		if (!id || !username) {
 			return fail(400, {
@@ -93,15 +94,18 @@ export const actions: Actions = {
 
 		const roomId = new Date().getTime();
 		// use zod to validate the things
-		const roomValues: Room = {
+		const roomValues: RoomPayload = {
 			id: roomId,
 			owner: {
 				id,
-				username
+				username,
+				rating: parseInt(rating)
 			},
 			time,
 			type,
 			style,
+			rating: 0,
+			privacy,
 			side
 		};
 

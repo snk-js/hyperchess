@@ -1,1 +1,1 @@
-export type TOPICS = 'ROOMS' | 'MATCH';
+export type TOPICS = 'ROOMS' | 'MATCH' | string;

@@ -6,7 +6,6 @@ export interface User {
 	name?: string;
 	email?: string;
 	clientId?: string;
-	connected?: boolean;
 	wsUrl?: string;
 	ws?: WebSocket | null;
 	playing: boolean;
@@ -19,7 +18,6 @@ export const userPlaceholder = {
 	email: '',
 	username: '',
 	clientId: '',
-	connected: false,
 	wsUrl: '',
 	ws: null,
 	playing: false,

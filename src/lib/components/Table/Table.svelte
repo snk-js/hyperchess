@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Room } from '$lib/store/rooms';
+	import type { RoomPayload } from '$lib/store/rooms';
 	import {
 		Table,
 		tableMapperValues,
@@ -10,6 +10,8 @@
 	import { getModalStore } from '@skeletonlabs/skeleton';
 	import { get } from 'svelte/store';
 	import userStore from '$lib/store/user';
+	import { publish } from '$lib/async/websockets/publish/post';
+	import { isLoading } from '$lib/store/loading';
 
 	const modalStore = getModalStore();
 	let tableData: TableSource = {
@@ -25,9 +27,6 @@
 		if (data.detail.length) {
 			const ownerId = data.detail.find((c: string | number | undefined) => c === get(userStore).id);
 
-			// if ownerId is equal to the currentUser id, then do nothing
-			// otherwise open the modal
-
 			if (ownerId) {
 				// set playing to true
 				userStore.update((user) => {
@@ -39,25 +38,29 @@
 				return;
 			}
 
-			const modal: ModalSettings = {
-				type: 'confirm',
-				// Data
-				title: '',
-				body: 'Are you sure you wish to proceed?',
-				// TRUE if confirm pressed, FALSE if cancel pressed
-				response: (r: boolean) => {
-					if (r) {
-						// set playing to true
-						userStore.update((user) => {
-							return {
-								...user,
-								playing: true
-							};
-						});
+			// setup a timer for this promise
+
+			new Promise<boolean>((resolve) => {
+				const modal: ModalSettings = {
+					type: 'confirm',
+					title: 'Please Confirm',
+					backdropClasses: 'glass black-glass',
+					modalClasses: 'bg-white',
+					body: 'Are you sure you wish to proceed?',
+					response: (r: boolean) => {
+						// set loading to  true
+						isLoading.set(true);
+						setTimeout(() => {
+							resolve(r);
+							// set loading to false
+							isLoading.set(false);
+						}, 2000);
 					}
-				}
-			};
-			modalStore.trigger(modal);
+				};
+				modalStore.trigger(modal);
+			}).then((r: any) => {
+				console.log('resolved response:', r);
+			});
 		}
 	};
 </script>

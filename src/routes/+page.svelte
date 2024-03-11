@@ -4,14 +4,12 @@
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 	import { get } from 'svelte/store';
-	import { getDigitsFromString } from '$lib/utils';
-	import { connectWs, registerClient } from '$lib/utils/ws';
+	import { registerClient } from '$lib/utils/ws';
 	import { pushNotification, notificationStore } from '$lib/store/toast';
 	import { getToastStore, type ToastSettings } from '@skeletonlabs/skeleton';
 	import { isLoading } from '$lib/store/loading';
 	import Spinner from '$lib/components/loading/Spinner.svelte';
-	import { roomsStore, type Room } from '$lib/store/rooms';
-	import { redirect } from '@sveltejs/kit';
+	import { roomsEventHandler } from '$lib/async/websockets/rooms/handler';
 
 	let loading = false;
 
@@ -19,19 +17,10 @@
 		loading = value;
 	});
 
-	// listen to the user id and if the user id doesnt exist, send it to login
 	$: {
 		const currentUser = get(userStore);
 		console.log({ currentUser });
-		// if (!currentUser.id) {
-		// 	userStore.update((_) => {
-		// 		return userPlaceholder;
-		// 	});
-		// 	throw redirect(302, '/login');
-		// }
 	}
-
-	// listen to the page data
 
 	export let data: PageData;
 	let disconnected = true;
@@ -39,8 +28,6 @@
 	const disconect = () => {
 		disconnected = true;
 	};
-
-	// if the user
 
 	const toastStore = getToastStore();
 	notificationStore.subscribe((logs) => {
@@ -64,22 +51,6 @@
 		return 'error';
 	});
 
-	// $: {
-	// 	console.log('reconnecting');
-	// 	console.log({ disconnected });
-	// 	if (disconnected) {
-	// 		const currentUser = get(userStore);
-	// 		// try reconnect
-	// 		registerClient(
-	// 			getDigitsFromString(currentUser.id as string),
-	// 			currentUser,
-	// 			disconect,
-	// 			data?.url || ''
-	// 		);
-	// 		disconnected = false;
-	// 	}
-	// }
-
 	$: {
 		data?.user &&
 			userStore.update((user) => {
@@ -95,21 +66,20 @@
 		const currentUser = get(userStore);
 		let ws: WebSocket | null = null;
 		// Ensure that this code runs only on the client side and currentUser has required properties
-		if (currentUser && currentUser.id && currentUser.wsUrl) {
-			registerClient(
-				getDigitsFromString(currentUser.id.toString()),
-				currentUser,
-				disconect,
-				'ROOMS'
-			)
+		if (currentUser && currentUser.id) {
+			registerClient('ROOMS', roomsEventHandler, currentUser)
 				.then((client) => {
-					console.log({ client });
-					ws = client;
-					console.log('WebSocket connected');
-					pushNotification({
-						message: 'Registered to listem to ROOMS',
-						type: 'success'
-					});
+					if (client && client.readyState === 1) {
+						userStore.set({
+							...currentUser,
+							ws
+						});
+						console.log('WebSocket connected');
+						pushNotification({
+							message: 'Rooms WebSocket connected',
+							type: 'success'
+						});
+					}
 				})
 				.catch((e) => {
 					console.error('Failed to register client:', e);
@@ -119,12 +89,6 @@
 						type: 'error'
 					});
 				});
-
-			userStore.set({
-				...currentUser,
-				connected: true,
-				ws
-			});
 		}
 
 		return () => {
