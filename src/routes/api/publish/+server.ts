@@ -1,29 +1,15 @@
-type PostPayload = { user_id: number; topic: string; message: string };
+import { publish } from '$lib/server/ws/registry.js';
+
+type PostPayload = { user_id?: string | number; topic: string; message: string };
 
 export const POST = async ({ request }) => {
 	const body: PostPayload = await request.json();
 
 	const { user_id, topic, message } = body;
 
-	const publish = await fetch('http://localhost:8000/publish', {
-		method: 'POST',
-		body: JSON.stringify({ user_id, topic, message }),
-		headers: {
-			'Content-Type': 'application/json'
-		}
+	const receivers = publish(topic, message, user_id === undefined ? undefined : String(user_id));
+
+	return new Response(JSON.stringify({ message: 'success', receivers }), {
+		status: 201
 	});
-
-	const result = await publish;
-
-	if (result.status === 200) {
-		return new Response(JSON.stringify({ message: 'success' }), {
-			status: 201
-		});
-	} else {
-		console.log(result.status);
-
-		return new Response(JSON.stringify({ message: 'fail' }), {
-			status: 500
-		});
-	}
 };

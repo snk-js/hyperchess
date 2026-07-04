@@ -2,7 +2,6 @@ import { pushNotification } from '$lib/store/toast';
 import type { User } from '$lib/store/user';
 
 import type { TOPICS } from '$lib/async/websockets/types';
-import { getDigitsFromString } from '.';
 
 export const registerClient = async (
 	topic: TOPICS,
@@ -11,7 +10,7 @@ export const registerClient = async (
 ): Promise<WebSocket | void> => {
 	console.log('registering, user:');
 	if (currentUser.id) {
-		const user_id = getDigitsFromString(currentUser.id.toString());
+		const user_id = currentUser.id;
 
 		try {
 			const ws = await connectAndAddWsMsgListener(user_id, topic, wsEventHanlder);
@@ -27,13 +26,17 @@ export const registerClient = async (
 	}
 };
 
-export const getWsUrl = async (user_id: number, topic: TOPICS) => {
+export const getWsUrl = async (user_id: string, topic: TOPICS) => {
 	const response = await fetch('api/ws', {
 		method: 'POST',
 		body: JSON.stringify({ user_id, topic })
 	});
 	const { result } = await response.json();
-	return result?.url;
+	if (!result?.client_id) return;
+	// build from our own origin: the server can't reliably know the
+	// browser-facing protocol/host (proxies, containers)
+	const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+	return `${proto}//${window.location.host}/ws/${result.client_id}`;
 };
 
 export const connectWs = (url: string) => {
@@ -57,7 +60,7 @@ export const connectWs = (url: string) => {
 };
 
 const connectAndAddWsMsgListener = async (
-	user_id: number,
+	user_id: string,
 	topic: string,
 	handler: (msg: MessageEvent) => void
 ) => {

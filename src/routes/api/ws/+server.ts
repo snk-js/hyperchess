@@ -1,21 +1,20 @@
-type PostPayload = { user_id: number; topic: string };
+import { register } from '$lib/server/ws/registry.js';
 
-export const POST = async ({ request }) => {
+type PostPayload = { user_id: string | number; topic: string };
+
+export const POST = async ({ request, url }) => {
 	const body: PostPayload = await request.json();
 
 	const { user_id, topic } = body;
 
-	const registerClient = await fetch('http://localhost:8000/register', {
-		method: 'POST',
-		body: JSON.stringify({ user_id, topic }),
-		headers: {
-			'Content-Type': 'application/json'
-		}
-	});
+	const clientId = register(String(user_id), topic);
+	const proto = url.protocol === 'https:' ? 'wss:' : 'ws:';
 
-	const result = await registerClient.json();
-
-	return new Response(JSON.stringify({ message: 'success', result: { ...result } }), {
-		status: 201
-	});
+	return new Response(
+		JSON.stringify({
+			message: 'success',
+			result: { url: `${proto}//${url.host}/ws/${clientId}`, client_id: clientId }
+		}),
+		{ status: 201 }
+	);
 };

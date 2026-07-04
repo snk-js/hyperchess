@@ -3,11 +3,10 @@ import { PrismaClient } from '@prisma/client';
 import type { User } from '$lib/store/user';
 import type { PageServerLoad } from './$types';
 import type { RoomPayload } from '$lib/store/rooms';
-import { getDigitsFromString } from '$lib/utils';
 
 const prisma = new PrismaClient();
 
-export const load: PageServerLoad = async ({ locals, fetch, request }) => {
+export const load: PageServerLoad = async ({ locals, request }) => {
 	const session = await locals.auth.validate();
 	const userId = session?.user?.userId;
 	if (!userId) {
@@ -34,34 +33,8 @@ export const load: PageServerLoad = async ({ locals, fetch, request }) => {
 		playing: false
 	};
 
-	if (!userData.clientId) {
-		const userId = user.id;
-		const roomId = getDigitsFromString(userId);
-
-		const registerWsPayload = {
-			user_id: roomId,
-			topic: 'ROOMS'
-		};
-
-		const response = await fetch('api/ws', {
-			method: 'POST',
-			body: JSON.stringify(registerWsPayload)
-		});
-
-		const { result } = await response.json();
-
-		if (result?.url) {
-			const client_id = result.url.split('/').pop() as string;
-			return {
-				user: {
-					...userData,
-					wsUrl: result.url,
-					clientId: client_id
-				},
-				url: request.url
-			};
-		}
-	}
+	// ws registration happens client-side only (registerClient in +page.svelte);
+	// registering here too used to leak a second, never-connected client
 	return { user: userData, url: request.url };
 };
 
