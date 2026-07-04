@@ -1,3 +1,7 @@
+> **DEPRECATED (2026-07-04):** this service is being replaced by an in-process
+> WebSocket server inside the Node app (docs/06-architecture-proposal.md, Option A).
+> Kept for history/reference only.
+
 # warp-websockets-example
 Basic example using websockets with warp in Rust
 

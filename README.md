@@ -1,50 +1,42 @@
-current state of the game:
-- pieces are moving
-- piece replacement is instable
-- needs websockets to connect two players
-- needs to validate move on the server
+# hyperchess
+
+3D multiplayer chess — SvelteKit + Threlte (Three.js), Lucia auth over Postgres/Prisma,
+and an in-process WebSocket pub/sub for rooms/matches (same origin as the app; the
+former external Rust relay lives in [ws-server/](ws-server/), deprecated).
+
+Full analysis, architecture and roadmap: [docs/](docs/README.md).
 
 [localhost-5173 (1).webm](https://github.com/snk-js/hyperchess/assets/34718184/eb851a8d-d12c-4477-8984-bc07f4f4de6b)
 
-
-# to run
-`yarn run dev -- --open`
-
-# create-svelte
-
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
-
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
+## Quickstart (dev)
 
 ```bash
-# create a new project in the current directory
-npm create svelte@latest
+# 1. database (host port 5433)
+docker compose up -d db
 
-# create a new project in my-app
-npm create svelte@latest my-app
+# 2. env + deps + schema
+cp .env.example .env
+pnpm install
+npx prisma migrate deploy && npx prisma generate
+
+# 3. run
+pnpm dev            # http://localhost:5173 (ws served on the same origin)
 ```
 
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Full stack in Docker
 
 ```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+docker compose up --build     # app on :3000 (self-migrating), db on :5433
 ```
 
-## Building
+## Current state
 
-To create a production version of your app:
+- ✅ Auth (signup/login/logout), rooms lobby broadcast over `/ws/<clientId>`
+- 🚧 Match move sync + server-side move validation — next up (docs/05, Tier 1)
+- Piece replacement instability from the original prototype still applies
 
-```bash
-npm run build
-```
+## Scripts
 
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+- `pnpm dev` / `pnpm build` / `pnpm preview` — vite; preview also serves the ws endpoint
+- `pnpm check` / `pnpm lint` — svelte-check / prettier+eslint
+- `pnpm model-pipeline:run` — GLB → Threlte components
