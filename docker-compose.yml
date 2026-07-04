@@ -1,0 +1,37 @@
+name: hyperchess
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: hyperchessuser
+      POSTGRES_PASSWORD: hyperchess
+      POSTGRES_DB: hyperchess
+    ports:
+      # host 5433 — 5432 is taken by the local Homebrew Postgres (other projects)
+      - '5433:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U hyperchessuser -d hyperchess']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      DATABASE_URL: postgresql://hyperchessuser:hyperchess@db:5432/hyperchess
+      NODE_ENV: production
+      # adapter-node needs the public origin to reconstruct request URLs
+      ORIGIN: http://localhost:3000
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
