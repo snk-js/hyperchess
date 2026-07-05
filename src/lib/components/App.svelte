@@ -4,6 +4,7 @@
 	import Table from './Table/Table.svelte';
 	import BorderWrapper from './borderWrapper/BorderWrapper.svelte';
 	import CreateRoom from './createRoom/CreateRoom.svelte';
+	import MyRooms from './myRooms/MyRooms.svelte';
 
 	/** @param {KeyboardEvent} event */
 	function handleKeydown(event: KeyboardEvent) {
@@ -45,7 +46,7 @@
 		</BorderWrapper>
 
 		<BorderWrapper title="My Rooms">
-			<CreateRoom />
+			<MyRooms />
 		</BorderWrapper>
 	</div>
 {/if}

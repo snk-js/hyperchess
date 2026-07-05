@@ -1,8 +1,14 @@
 import { tableMapperValues, type TableSource } from '@skeletonlabs/skeleton';
-import { writable } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
+import userStore from './user';
 // src/lib/store/index.ts
 
 export const roomsStore = writable<Room[]>([]);
+
+/** Rooms owned by the currently logged-in user. */
+export const myRoomsStore = derived([roomsStore, userStore], ([$rooms, $user]) =>
+	$user.id ? $rooms.filter((room) => room.owner.id === $user.id) : []
+);
 
 type RoomUser = {
 	id: string;
@@ -83,6 +89,9 @@ export type Room = {
 	rating: number;
 	privacy: string;
 };
+
+// Alias kept because most of the app imports the room shape under this name.
+export type RoomPayload = Room;
 
 export const addRoom = (room: Room) => {
 	roomsStore.update((n) => [...n, room]);
