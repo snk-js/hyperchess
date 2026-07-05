@@ -1,9 +1,11 @@
 // Pure hyperchess rules — no Svelte stores, no DOM. This is the authority the
-// server uses to validate moves, and mirrors the geometry in
-// `$lib/utils/moves.ts` that the client uses for highlighting.
+// server uses to validate moves.
 //
-// Faithful to the current game: pieces move onto EMPTY squares only (captures
-// are not modelled yet), and sliding pieces are blocked by any occupant.
+// Movement: sliding pieces (queen/rook/bishop) slide until they hit an occupant;
+// an enemy occupant can be captured (the ray stops there), a friendly one blocks.
+// Stepping pieces (king/knight) may land on an empty or enemy square. Pawns move
+// forward onto empty squares (with a two-step first move from their home rank
+// through an empty intermediate) and capture only along their diagonal deltas.
 import { pieces } from '$lib/utils/directions';
 
 export const BOARDSIZE = 8;
@@ -34,14 +36,21 @@ export function cloneBoard(state: BoardState): BoardState {
 	return new Map(state);
 }
 
-// Sliding pieces: walk each delta until out of bounds or blocked; empty squares
-// only (the blocker itself is not a legal target — no captures yet).
-function slidingTargets(state: BoardState, from: Coord, deltas: readonly number[][]): Coord[] {
+// Sliding pieces: walk each delta until out of bounds or blocked. An empty
+// square is a legal target; an enemy occupant is a legal target (capture) and
+// stops the ray; a friendly occupant stops the ray without being a target.
+function slidingTargets(state: BoardState, from: Coord, side: Side, deltas: readonly number[][]): Coord[] {
 	const out: Coord[] = [];
 	for (const [dx, dy, dz] of deltas) {
 		let [x, y, z] = [from[0] + dx, from[1] + dy, from[2] + dz];
-		while (isWithinBounds(x, y, z) && !state.has(key(x, y, z))) {
-			out.push([x, y, z]);
+		while (isWithinBounds(x, y, z)) {
+			const occ = state.get(key(x, y, z));
+			if (!occ) {
+				out.push([x, y, z]);
+			} else {
+				if (occ.side !== side) out.push([x, y, z]); // capture
+				break;
+			}
 			x += dx;
 			y += dy;
 			z += dz;
@@ -50,13 +59,47 @@ function slidingTargets(state: BoardState, from: Coord, deltas: readonly number[
 	return out;
 }
 
-// Stepping pieces: each delta once; in bounds and empty.
-function stepTargets(state: BoardState, from: Coord, deltas: readonly number[][]): Coord[] {
+// Stepping pieces: each delta once; in bounds and either empty or an enemy.
+function stepTargets(state: BoardState, from: Coord, side: Side, deltas: readonly number[][]): Coord[] {
 	const out: Coord[] = [];
 	for (const [dx, dy, dz] of deltas) {
 		const c: Coord = [from[0] + dx, from[1] + dy, from[2] + dz];
+		if (!isWithinBounds(...c)) continue;
+		const occ = state.get(key(...c));
+		if (!occ || occ.side !== side) out.push(c);
+	}
+	return out;
+}
+
+function pawnTargets(state: BoardState, from: Coord, side: Side): Coord[] {
+	const pawn = pieces.limited.pawn(side);
+	const out: Coord[] = [];
+
+	// forward: onto empty squares only
+	for (const [dx, dy, dz] of pawn.moves) {
+		const c: Coord = [from[0] + dx, from[1] + dy, from[2] + dz];
 		if (isWithinBounds(...c) && !state.has(key(...c))) out.push(c);
 	}
+
+	// first move: two steps, only from the home rank, through an empty intermediate
+	const homeRank = side === 'white' ? 1 : 6;
+	if (from[1] === homeRank) {
+		const step = side === 'white' ? 1 : -1;
+		const mid: Coord = [from[0], from[1] + step, from[2]];
+		for (const [dx, dy, dz] of pawn.first) {
+			const c: Coord = [from[0] + dx, from[1] + dy, from[2] + dz];
+			if (isWithinBounds(...c) && !state.has(key(...mid)) && !state.has(key(...c))) out.push(c);
+		}
+	}
+
+	// diagonal deltas: capture only (must land on an enemy)
+	for (const [dx, dy, dz] of pawn.attack) {
+		const c: Coord = [from[0] + dx, from[1] + dy, from[2] + dz];
+		if (!isWithinBounds(...c)) continue;
+		const occ = state.get(key(...c));
+		if (occ && occ.side !== side) out.push(c);
+	}
+
 	return out;
 }
 
@@ -67,20 +110,17 @@ export function generateMoves(state: BoardState, from: Coord): Coord[] {
 
 	switch (p.piece) {
 		case 'queen':
-			return slidingTargets(state, from, pieces.unlimited.queen);
+			return slidingTargets(state, from, p.side, pieces.unlimited.queen);
 		case 'rook':
-			return slidingTargets(state, from, pieces.unlimited.rook);
+			return slidingTargets(state, from, p.side, pieces.unlimited.rook);
 		case 'bishop':
-			return slidingTargets(state, from, pieces.unlimited.bishop);
+			return slidingTargets(state, from, p.side, pieces.unlimited.bishop);
 		case 'king':
-			return stepTargets(state, from, pieces.limited.king);
+			return stepTargets(state, from, p.side, pieces.limited.king);
 		case 'knight':
-			return stepTargets(state, from, pieces.limited.knight);
-		case 'pawn': {
-			const pawn = pieces.limited.pawn(p.side);
-			// union of forward / first-double / diagonal moves (all empty-only today)
-			return stepTargets(state, from, [...pawn.moves, ...pawn.first, ...pawn.attack]);
-		}
+			return stepTargets(state, from, p.side, pieces.limited.knight);
+		case 'pawn':
+			return pawnTargets(state, from, p.side);
 	}
 }
 
