@@ -24,10 +24,9 @@ I'd do first.
    of the store-coupled `moves.ts` into a `$lib/game` module that takes an
    explicit board state (no Svelte stores), with `isLegalMove` / `applyMove`.
    Fully unit-testable; the authority the MATCH flow needs.
-2. **MATCH flow + move sync** — join a room → `MATCH:<roomId>` topic, both
-   players subscribe, moves published as structured messages, validated on the
-   server (step 1) and applied on both boards. The headline "connect two
-   players" feature.
+2. **MATCH flow + move sync** — 🟡 **server core done** (feat/match-flow, with
+   captures + king-capture win, e2e-verified); **client 3D wiring remains** —
+   see [08-match-flow-next-steps.md](08-match-flow-next-steps.md).
 3. **Roll-your-own auth** (Tier 2 below) — remove Lucia, hand-rolled sessions.
 
 - ✅ **Room listing snapshot** (done, feat/room-persistence): `room` table via
