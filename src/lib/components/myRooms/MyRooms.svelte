@@ -7,9 +7,15 @@
 		userStore.update((user) => ({ ...user, playing: true }));
 	};
 
-	const cancelRoom = (id: number) => {
-		removeRoom(id);
-		pushNotification({ message: 'Room cancelled', type: 'success' });
+	const cancelRoom = async (id: number) => {
+		const response = await fetch(`/api/rooms/${id}`, { method: 'DELETE' });
+		if (response.ok) {
+			// remove locally for instant feedback; peers get the room_removed delta
+			removeRoom(id);
+			pushNotification({ message: 'Room cancelled', type: 'success' });
+		} else {
+			pushNotification({ message: 'Could not cancel room', type: 'error' });
+		}
 	};
 </script>
 

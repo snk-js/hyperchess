@@ -1,11 +1,9 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import { createRoomSubmit } from '$lib/async/websockets/publish/actions';
 	import { isLoading } from '$lib/store/loading';
 	import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
 	import { get } from 'svelte/store';
 	import userStore from '$lib/store/user';
-	import { roomsStore } from '$lib/store/rooms';
+	import { addRoom, roomsStore } from '$lib/store/rooms';
 	import { pushNotification } from '$lib/store/toast';
 	import { errors } from '$lib/errorMessages';
 
@@ -14,45 +12,44 @@
 	let gameStyle = 'match';
 	let side = 'random';
 
-	const createRoomAction = async ({ formData }: { formData: FormData }) => {
-		const { id, username, rating } = get(userStore);
-		const userPayload = { id: id || '', username: username || '', rating: rating || 0 };
+	const createRoom = async (event: SubmitEvent) => {
+		event.preventDefault();
 		const userId = get(userStore).id;
-		const rooms = get(roomsStore);
 
-		if (rooms.find((room) => room.owner.id === userId)) {
+		if (get(roomsStore).find((room) => room.owner.id === userId)) {
 			pushNotification({ message: errors.rooms.publish.alreadyCreated, type: 'error' });
 			return;
 		}
 
 		isLoading.set(true);
-		const result = await new Promise((resolve) => {
-			createRoomSubmit(
-				formData,
-				{
-					timeSelect,
-					privacy,
-					gameStyle,
-					side
-				},
-				userPayload
-			).then((result) => {
-				setTimeout(() => {
-					isLoading.set(false);
-					resolve(result);
-				}, 1700);
+		try {
+			const response = await fetch('/api/rooms', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ time: timeSelect, style: gameStyle, side, privacy })
 			});
-		});
 
-		isLoading.set(false);
+			if (!response.ok) {
+				pushNotification({ message: errors.rooms.publish.notPublished, type: 'error' });
+				return;
+			}
 
-		return result;
+			// add locally for instant feedback; the ROOMS delta dedups by id for peers
+			const { room } = await response.json();
+			if (room && !get(roomsStore).find((r) => r.id === room.id)) addRoom(room);
+			pushNotification({ message: 'Room created', type: 'success' });
+		} catch (e) {
+			console.error(e);
+			pushNotification({ message: errors.rooms.publish.notPublished, type: 'error' });
+		} finally {
+			isLoading.set(false);
+		}
 	};
 </script>
 
 <div class="glass p-4 text-green-200 font-bold">
 	<div class="asdasd">
-		<form method="post" use:enhance={createRoomAction}>
+		<form on:submit={createRoom}>
 			<div class="my-3">
 				<label class="label" for="name">
 					<span> match name </span>

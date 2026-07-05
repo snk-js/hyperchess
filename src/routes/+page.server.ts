@@ -1,10 +1,8 @@
-import { redirect, type Actions, fail } from '@sveltejs/kit';
-import { PrismaClient } from '@prisma/client';
+import { redirect } from '@sveltejs/kit';
+import { prisma } from '$lib/server/prisma';
+import { listOpenRooms } from '$lib/server/rooms/service';
 import type { User } from '$lib/store/user';
 import type { PageServerLoad } from './$types';
-import type { RoomPayload } from '$lib/store/rooms';
-
-const prisma = new PrismaClient();
 
 export const load: PageServerLoad = async ({ locals, request }) => {
 	const session = await locals.auth.validate();
@@ -34,54 +32,7 @@ export const load: PageServerLoad = async ({ locals, request }) => {
 	};
 
 	// ws registration happens client-side only (registerClient in +page.svelte);
-	// registering here too used to leak a second, never-connected client
-	return { user: userData, url: request.url };
-};
-
-export const actions: Actions = {
-	default: async ({ request, fetch }) => {
-		const formData = await request.formData();
-
-		const time = formData.get('time') as RoomPayload['time'];
-		const type = formData.get('privacy') as RoomPayload['type'];
-		const style = formData.get('gameStyle') as RoomPayload['style'];
-		const side = formData.get('side') as RoomPayload['side'];
-		const id = formData.get('userId') as string;
-		const username = formData.get('username') as string;
-		const rating = formData.get('rating') as string;
-		const privacy = formData.get('privacy') as string;
-
-		if (!id || !username) {
-			return fail(400, {
-				message: 'Invalid user'
-			});
-		}
-
-		[time, type, style, side].forEach((value) => {
-			if (value.length > 10) {
-				return fail(400, {
-					message: 'Invalid room values'
-				});
-			}
-		});
-
-		const roomId = new Date().getTime();
-		// use zod to validate the things
-		const roomValues: RoomPayload = {
-			id: roomId,
-			owner: {
-				id,
-				username,
-				rating: parseInt(rating)
-			},
-			time,
-			type,
-			style,
-			rating: 0,
-			privacy,
-			side
-		};
-
-		return { roomValues };
-	}
+	// the room snapshot is fetched here so late joiners see rooms opened before
+	// they connected — the ROOMS topic only carries deltas afterwards.
+	return { user: userData, url: request.url, rooms: await listOpenRooms() };
 };

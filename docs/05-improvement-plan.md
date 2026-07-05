@@ -19,10 +19,12 @@ I'd do first.
 
 ## Tier 1 — finish the multiplayer core (the actual missing feature)
 
-- 🔴 **Room listing snapshot**: a new lobby visitor currently sees only rooms
-  published *after* they connect. Persist rooms (Postgres table via Prisma —
-  `Room {id, ownerId, time, style, side, privacy, status}`) and serve
-  `GET /rooms` from SvelteKit; use the WS topic only for deltas.
+- ✅ **Room listing snapshot** (done, feat/room-persistence): `room` table via
+  Prisma, `GET /api/rooms` snapshot served in the lobby's server load, and
+  `POST /api/rooms` / `DELETE /api/rooms/[id]` persist and broadcast
+  `room_added` / `room_removed` deltas on the ROOMS topic (fan-out via the
+  in-process registry, no HTTP hop). Zod-validated payload; owner identity from
+  the session; one open room per owner. Covered by unit + e2e tests.
 - 🔴 **MATCH flow**: joining a room creates a match topic (`MATCH:<roomId>`),
   both players subscribe, and *moves* are published as structured messages
   (`{type:'move', from, to, piece, seq}`). The client stores/`moves.ts` already
@@ -43,6 +45,11 @@ I'd do first.
   a ~200-line session module over Prisma. Alternatives: Better Auth (batteries
   included), or Auth.js if you ever want OAuth providers. Keep the same
   `auth_user` table, re-hash passwords on first login if changing hash formats.
+  - ⚠️ Known trap surfaced during room-persistence work: the config sets the
+    Lucia **v1** option `transformDatabaseUser`, which v2 ignores in favour of
+    `getUserAttributes`. So `session.user` only carries `userId` — `username`
+    and `name` are `undefined`. Server code must re-fetch the user from Prisma
+    (as the lobby load and the room service do). Fix when migrating.
 - Remove the manual `secure: false` session cookie in `login/+page.server.ts`
   (it's even commented "prod: disable this").
 - Re-enable CSRF (`csrf.checkOrigin`) and drop wildcard CORS in `hooks.server.ts`
