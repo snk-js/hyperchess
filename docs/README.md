@@ -19,6 +19,8 @@ restructuring done the same day.
 | [05-improvement-plan.md](05-improvement-plan.md) | Tiered backlog — Tier 0 is done; **Tier 1 (multiplayer core) is next** |
 | [06-architecture-proposal.md](06-architecture-proposal.md) | Architecture options; Option A (chosen) target shape |
 | [07-cicd-and-repo-strategy.md](07-cicd-and-repo-strategy.md) | Repo strategy (monorepo — done) + staged CI/CD plan (still to build) |
+| [08-match-flow-next-steps.md](08-match-flow-next-steps.md) | MATCH flow: server core done (PR #7); client 3D wiring steps *(on `feat/match-flow` until the stack merges)* |
+| [09-auth-sessions-plan.md](09-auth-sessions-plan.md) | **Mounted plan**: replace deprecated Lucia (v2+v3) with roll-your-own sessions — design, call-site inventory, tests |
 | [scripts/dev-init.sh](scripts/dev-init.sh) | One-shot dev bootstrap *(pre-merge paths; superseded by README quickstart)* |
 
 ## TL;DR state of the project
