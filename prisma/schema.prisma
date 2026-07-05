@@ -18,8 +18,29 @@ model AuthUser {
   auth_session AuthSession[]
   auth_key     AuthKey[]
   rooms        Room[]
+  white_games  Game[]        @relation("WhiteGames")
+  black_games  Game[]        @relation("BlackGames")
 
   @@map("auth_user")
+}
+
+model Game {
+  id            String   @id @default(uuid())
+  roomId        BigInt?
+  whitePlayerId String
+  blackPlayerId String
+  board         Json
+  turn          String   @default("white")
+  status        String   @default("active")
+  winnerId      String?
+  moves         Json     @default("[]")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  whitePlayer   AuthUser @relation("WhiteGames", references: [id], fields: [whitePlayerId], onDelete: Cascade)
+  blackPlayer   AuthUser @relation("BlackGames", references: [id], fields: [blackPlayerId], onDelete: Cascade)
+
+  @@index([status])
+  @@map("game")
 }
 
 model Room {
