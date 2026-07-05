@@ -1,43 +1,34 @@
-import { addRoom, roomsStore } from '$lib/store/rooms';
+import { addRoom, removeRoom, roomsStore } from '$lib/store/rooms';
 import { pushNotification } from '$lib/store/toast';
-import userStore from '$lib/store/user';
 import { get } from 'svelte/store';
-import type { RoomPayloadMessage } from '../publish/post';
+import type { RoomDelta } from '../types';
 
 export const roomsEventHandler = (event: MessageEvent) => {
 	if (!event?.data) {
 		pushNotification({ message: 'Event has no data', type: 'error' });
-		throw new Error('Event has no data');
-	}
-	const message: RoomPayloadMessage = JSON.parse(event.data);
-
-	if (!message?.topic) {
-		pushNotification({ message: 'Message has no topic', type: 'error' });
-		throw new Error('Message has no topic');
+		return;
 	}
 
-	if (message.topic === 'ROOMS') {
-		roomsMessageEffect(message);
-	}
-};
-
-const roomsMessageEffect = (roomMessage: RoomPayloadMessage) => {
-	if (!roomMessage.sender || !roomMessage.payload) {
-		const erroMsg = 'Message has no sender or payload';
-		pushNotification({ message: erroMsg, type: 'error' });
-		throw new Error(erroMsg);
+	let delta: RoomDelta;
+	try {
+		delta = JSON.parse(event.data);
+	} catch {
+		pushNotification({ message: 'Malformed room update', type: 'error' });
+		return;
 	}
 
-	const rooms = get(roomsStore);
-	if (!rooms.find((room) => room.id === roomMessage.payload.id)) {
-		addRoom(roomMessage.payload);
-	}
-	if (roomMessage.sender === get(userStore).id) {
-		userStore.update((user) => {
-			return {
-				...user,
-				playing: true
-			};
-		});
+	switch (delta.kind) {
+		case 'room_added': {
+			const incoming = delta.room;
+			const rooms = get(roomsStore);
+			// dedup: the creator also receives the echo of their own room
+			if (!rooms.find((room) => room.id === incoming.id)) {
+				addRoom(incoming);
+			}
+			break;
+		}
+		case 'room_removed':
+			removeRoom(delta.id);
+			break;
 	}
 };

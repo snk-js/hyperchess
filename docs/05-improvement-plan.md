@@ -19,10 +19,12 @@ I'd do first.
 
 ## Tier 1 — finish the multiplayer core (the actual missing feature)
 
-- 🔴 **Room listing snapshot**: a new lobby visitor currently sees only rooms
-  published *after* they connect. Persist rooms (Postgres table via Prisma —
-  `Room {id, ownerId, time, style, side, privacy, status}`) and serve
-  `GET /rooms` from SvelteKit; use the WS topic only for deltas.
+- ✅ **Room listing snapshot** (done, feat/room-persistence): `room` table via
+  Prisma, `GET /api/rooms` snapshot served in the lobby's server load, and
+  `POST /api/rooms` / `DELETE /api/rooms/[id]` persist and broadcast
+  `room_added` / `room_removed` deltas on the ROOMS topic (fan-out via the
+  in-process registry, no HTTP hop). Zod-validated payload; owner identity from
+  the session; one open room per owner. Covered by unit + e2e tests.
 - 🔴 **MATCH flow**: joining a room creates a match topic (`MATCH:<roomId>`),
   both players subscribe, and *moves* are published as structured messages
   (`{type:'move', from, to, piece, seq}`). The client stores/`moves.ts` already
@@ -38,11 +40,34 @@ I'd do first.
 
 ## Tier 2 — auth & security hardening
 
-- 🔴 **Migrate off Lucia v2** (deprecated upstream). Given the schema is only 3
-  tables, the cheapest durable path is Lucia's own "roll your own" guidance:
-  a ~200-line session module over Prisma. Alternatives: Better Auth (batteries
-  included), or Auth.js if you ever want OAuth providers. Keep the same
-  `auth_user` table, re-hash passwords on first login if changing hash formats.
+- 🔴 **Migrate off Lucia entirely** (the whole library is deprecated — **v2 and
+  v3 both**). Do **not** upgrade v2 → v3: v3 is deprecated too. Per the official
+  guidance (<https://lucia-auth.com/lucia-v3/migrate>, session guide
+  <https://lucia-auth.com/sessions/basic>), Lucia is now a *learning resource*
+  and the recommended path is to implement sessions yourself — no DB migration
+  needed. Concretely for this project:
+  - A ~150–200 line session module over Prisma: `generateSessionId`
+    (32+ bytes CSPRNG, base32), `createSession` / `validateSession` (with
+    sliding half-life renewal) / `invalidateSession` / `invalidateAllSessions`,
+    and `set/deleteSessionCookie` (`HttpOnly; SameSite=Lax; Path=/; Secure` in
+    prod, no `Secure` on localhost). Password hashing via `@node-rs/argon2` or
+    `oslo`.
+  - Reuse the existing tables: `auth_session` (rename/keep) for sessions,
+    `auth_key.hashed_password` for credentials. Switching hash formats means
+    re-hashing on next successful login, or accept a one-time sign-out of all
+    users (simplest).
+  - This also removes the two Lucia-v2 traps below in one move.
+  - Alternatives if you'd rather not hand-roll: **Better Auth** (batteries
+    included, actively maintained) or **Auth.js** (if you want OAuth providers).
+  - ⚠️ Trap #1 (surfaced during room-persistence work): the config sets the
+    Lucia **v1** option `transformDatabaseUser`, which v2 ignores in favour of
+    `getUserAttributes`. So `session.user` only carries `userId` — `username`
+    and `name` are `undefined`. Server code must re-fetch the user from Prisma
+    (as the lobby load and the room service do).
+  - ⚠️ Trap #2: Lucia v2 CSRF-protects every non-GET `validate()` by matching
+    the `Origin` header to the host — so `locals.auth.validate()` returns null
+    on a POST/DELETE without a matching `Origin`. Browsers always send it (so
+    the app works), but server-to-server or curl calls must set `Origin`.
 - Remove the manual `secure: false` session cookie in `login/+page.server.ts`
   (it's even commented "prod: disable this").
 - Re-enable CSRF (`csrf.checkOrigin`) and drop wildcard CORS in `hooks.server.ts`

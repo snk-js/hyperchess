@@ -10,6 +10,7 @@
 	import { isLoading } from '$lib/store/loading';
 	import Spinner from '$lib/components/loading/Spinner.svelte';
 	import { roomsEventHandler } from '$lib/async/websockets/rooms/handler';
+	import { roomsStore } from '$lib/store/rooms';
 
 	let loading = false;
 
@@ -63,6 +64,8 @@
 	}
 	onMount(() => {
 		console.log('on mount');
+		// seed the lobby from the server snapshot before deltas start arriving
+		roomsStore.set(data.rooms ?? []);
 		const currentUser = get(userStore);
 		let ws: WebSocket | null = null;
 		// Ensure that this code runs only on the client side and currentUser has required properties

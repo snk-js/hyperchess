@@ -57,9 +57,10 @@ static demo deploy. Working tree is clean.
 - `postgres.md` — manual local Postgres bootstrap notes (has a typo: `pqsl`;
   and mixes placeholder names `myuser`/`hyperchessuser`).
 
-⚠️ **Lucia was deprecated upstream** (project sunset in 2025); v2 was already
-legacy when written. Any revival of this project should migrate auth (see
-[05-improvement-plan.md](05-improvement-plan.md)).
+⚠️ **Lucia is deprecated upstream — the whole library, v2 *and* v3** (it's now a
+"learning resource," per <https://lucia-auth.com/lucia-v3/migrate>). Upgrading to
+v3 is a dead end; the official path is a small roll-your-own session module. See
+the Tier 2 plan in [05-improvement-plan.md](05-improvement-plan.md).
 
 ## Multiplayer / rooms (half-done 🚧)
 

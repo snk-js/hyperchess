@@ -17,8 +17,28 @@ model AuthUser {
   email        String?       @unique
   auth_session AuthSession[]
   auth_key     AuthKey[]
+  rooms        Room[]
 
   @@map("auth_user")
+}
+
+model Room {
+  id        BigInt   @id
+  ownerId   String
+  username  String
+  rating    Int      @default(0)
+  time      String
+  style     String
+  side      String
+  type      String
+  privacy   String
+  status    String   @default("open")
+  createdAt DateTime @default(now())
+  owner     AuthUser @relation(references: [id], fields: [ownerId], onDelete: Cascade)
+
+  @@index([ownerId])
+  @@index([status])
+  @@map("room")
 }
 
 model AuthSession {
