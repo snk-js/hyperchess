@@ -19,6 +19,17 @@ I'd do first.
 
 ## Tier 1 — finish the multiplayer core (the actual missing feature)
 
+**Sequenced next steps (agreed 2026-07-05):**
+1. **Server-side move validation foundation** — extract the pure chess rules out
+   of the store-coupled `moves.ts` into a `$lib/game` module that takes an
+   explicit board state (no Svelte stores), with `isLegalMove` / `applyMove`.
+   Fully unit-testable; the authority the MATCH flow needs.
+2. **MATCH flow + move sync** — join a room → `MATCH:<roomId>` topic, both
+   players subscribe, moves published as structured messages, validated on the
+   server (step 1) and applied on both boards. The headline "connect two
+   players" feature.
+3. **Roll-your-own auth** (Tier 2 below) — remove Lucia, hand-rolled sessions.
+
 - ✅ **Room listing snapshot** (done, feat/room-persistence): `room` table via
   Prisma, `GET /api/rooms` snapshot served in the lobby's server load, and
   `POST /api/rooms` / `DELETE /api/rooms/[id]` persist and broadcast
