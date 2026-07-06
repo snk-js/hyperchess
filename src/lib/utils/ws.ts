@@ -1,5 +1,5 @@
 import { pushNotification } from '$lib/store/toast';
-import type { User } from '$lib/store/user';
+import userStore, { type User } from '$lib/store/user';
 
 import type { TOPICS } from '$lib/async/websockets/types';
 
@@ -33,6 +33,8 @@ export const getWsUrl = async (user_id: string, topic: TOPICS) => {
 	});
 	const { result } = await response.json();
 	if (!result?.client_id) return;
+	// remember the client id: topic subscriptions (e.g. MATCH:<gameId>) need it
+	userStore.update((u) => ({ ...u, clientId: result.client_id }));
 	// build from our own origin: the server can't reliably know the
 	// browser-facing protocol/host (proxies, containers)
 	const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';

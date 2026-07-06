@@ -1,6 +1,6 @@
 import { writable, get } from 'svelte/store';
 import type { Writable } from 'svelte/store';
-import { isWithinBounds } from '$lib/utils/moves';
+import { isWithinBounds } from '$lib/game/rules';
 
 export type Piece = 'queen' | 'king' | 'bishop' | 'knight' | 'rook' | 'pawn' | '';
 
@@ -123,6 +123,48 @@ putPieces.forEach((pieceInfo) => {
 		piece: pieceInfo.piece
 	}));
 });
+
+/**
+ * Replace the whole board from a serialized state (`"x,y,z" -> {piece, side}`),
+ * clearing selection/highlight flags. Used when a match starts and after every
+ * server-confirmed move (the server board is authoritative).
+ */
+export const hydrateBoard = (state: Record<string, { piece: Piece; side: Side }>) => {
+	for (let x = 0; x < BOARDSIZE; x++) {
+		for (let y = 0; y < BOARDSIZE; y++) {
+			for (let z = 0; z < BOARDSIZE; z++) {
+				const entry = state[`${x},${y},${z}`];
+				board[x][y][z].update((oldCell) => ({
+					...oldCell,
+					piece: entry?.piece ?? '',
+					side: entry?.side ?? '',
+					selected: false,
+					activated: false,
+					highlighted: { activated: false, selected: false }
+				}));
+			}
+		}
+	}
+};
+
+/** Serialize the current board into the shared rules-module shape. */
+export const snapshotBoard = (): Map<
+	string,
+	{ piece: Exclude<Piece, ''>; side: Exclude<Side, ''> }
+> => {
+	const state = new Map<string, { piece: Exclude<Piece, ''>; side: Exclude<Side, ''> }>();
+	for (let x = 0; x < BOARDSIZE; x++) {
+		for (let y = 0; y < BOARDSIZE; y++) {
+			for (let z = 0; z < BOARDSIZE; z++) {
+				const cell = get(board[x][y][z]);
+				if (cell.piece && cell.side) {
+					state.set(`${x},${y},${z}`, { piece: cell.piece, side: cell.side });
+				}
+			}
+		}
+	}
+	return state;
+};
 
 export const updateCell = (coord: PieceCoords, cell: Partial<Cell>) => {
 	const [x, y, z] = coord;

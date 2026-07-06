@@ -1,7 +1,64 @@
 # MATCH flow — status & next steps
 
-*Branch `feat/match-flow` (stacked on `feat/game-rules` → `feat/room-persistence`).
-Server core is done and tested; the client 3D wiring is the remaining work.*
+*Server core: ✅ merged (PR #7). Client 3D wiring: ✅ implemented on
+`feat/match-client` (2026-07-06) — all 7 steps below are built; what remains is
+**human click-through of the 3D board** (can't be verified headlessly).*
+
+## As built (feat/match-client)
+
+- `src/lib/store/game.ts` — `gameStore` (`myColor`/`turn`/`status`), `isMyTurn`
+- `$lib/store` gains `hydrateBoard` (server board → 3D cells, authoritative
+  after every move) and `snapshotBoard` (cells → rules-module `BoardState`)
+- `match/handler.ts` — `enterMatch` (store + hydrate + subscribe `MATCH:<id>` +
+  playing), `enterMatchById` (owner side), `matchDeltaHandler` (`move_applied`
+  → re-hydrate, turn/status, win/lose toast), `sendMove` (POST, 409 → toast)
+- `rooms/handler.ts` is now the single socket dispatcher: room deltas +
+  `game_started` (owner auto-enters) + `move_applied`
+- `Table.svelte` — clicking a room: own room → wait at board; other's room →
+  confirm modal → `POST /api/rooms/[id]/join` → `enterMatch`
+- `CubeStatus.addToMovePiece` — in a match, POSTs the move (server delta drives
+  the board); sandbox keeps local `movePiece`
+- `Piece.svelte` — in a match: own pieces selectable only on your turn;
+  clicking a highlighted enemy piece performs the capture
+- `cellStates.ts` highlights now come from `$lib/game/rules.generateMoves` over
+  a live board snapshot — identical legality to the server, captures included;
+  the old empty-only `$lib/utils/moves.ts` and the legacy `publish/` helpers
+  are deleted
+- ws client id is stored on registration (needed for `/api/add` MATCH subscribe)
+
+Verified headlessly: 54 unit tests (board round-trip, game store added), rooms +
+match server e2e, svelte-check (no new errors), production build, lobby SSR.
+
+## Manual click-through checklist (needs two browsers)
+
+1. Sign up two users (A, B) in two browsers; both land in the lobby.
+2. A creates a room (side: white). B sees it appear live in Rooms.
+3. B clicks the room → confirm → both flip to the board; toasts say
+   "you play white/black"; board is in the starting position.
+4. A (white) clicks an own pawn → legal squares highlight (captures included
+   once reachable) → clicks a target → the move appears on BOTH boards; A
+   gets "Not your turn" if clicking again.
+5. B moves; alternation continues; illegal/foreign-piece clicks are inert or
+   toast.
+6. Capture a piece — the captured piece disappears (board re-hydrates).
+7. Capture a king — winner/loser toasts fire, further moves are rejected.
+8. Refresh mid-game: lobby returns (room is gone); rejoining the match after
+   reload is NOT wired yet (known gap below).
+
+## Known gaps / follow-ups
+
+- **Reconnect**: after a reload the game isn't rejoined automatically
+  (`GET /api/games/[id]` exists; needs a "current game" lookup + auto-enter).
+- **Escape** leaves the board view but the match stays active (no
+  resign/abandon lifecycle yet).
+- Local sandbox `movePiece` still swaps pieces (no capture) — match mode is
+  unaffected (server board is authoritative).
+- No optimistic move application (small perceived latency: move renders when
+  the delta returns).
+
+---
+
+*Historical plan below (as written before implementation).*
 
 ## Done (server core — verified)
 

@@ -1,5 +1,5 @@
-import { genMoves } from '$lib/utils/moves';
-import { updateCells, type PieceCoords, type CellStates, board } from '.';
+import { generateMoves, type Coord } from '$lib/game/rules';
+import { updateCells, snapshotBoard, type PieceCoords, type CellStates, board } from '.';
 import { get, writable } from 'svelte/store';
 import type { CellStatesMapping } from '.';
 
@@ -16,10 +16,10 @@ export const updateCellStatus = (coords: PieceCoords[], cellState: CellStates, s
 
 	if (cellState === 'selected' && state) {
 		const cell = get(board[coords[0][0]][coords[0][1]][coords[0][2]]);
-		if (cell.piece === 'pawn') {
-			highlightedCells = genMoves['pawn'](cell.side).moves(cell.coords);
-		} else if (cell.piece) {
-			highlightedCells = genMoves[cell.piece](cell.coords);
+		if (cell.piece) {
+			// shared rules module: same legality the server enforces, including
+			// capture targets (enemy-occupied squares) and pawn first/attack moves
+			highlightedCells = generateMoves(snapshotBoard(), cell.coords as Coord);
 		}
 
 		updatedCells.update((cells) => {
