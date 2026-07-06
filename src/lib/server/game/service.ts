@@ -93,6 +93,15 @@ export async function getGame(gameId: string): Promise<GameState | null> {
 	return game ? toState(game) : null;
 }
 
+/** The player's active game, if any — used to reconnect after a reload. */
+export async function getCurrentGameFor(userId: string): Promise<GameState | null> {
+	const game = await prisma.game.findFirst({
+		where: { status: 'active', OR: [{ whitePlayerId: userId }, { blackPlayerId: userId }] },
+		orderBy: { createdAt: 'desc' }
+	});
+	return game ? toState(game) : null;
+}
+
 /**
  * Validate a move server-side and, if legal, persist the new board and broadcast
  * it to both players on the MATCH topic. Throws with a machine-readable message
