@@ -16,8 +16,7 @@ const MOVE_ERRORS = new Set([
 ]);
 
 export const POST = async ({ params, request, locals }) => {
-	const session = await locals.auth.validate();
-	if (!session) throw error(401, 'Not authenticated');
+	if (!locals.user) throw error(401, 'Not authenticated');
 
 	const parsed = moveSchema.safeParse(await request.json());
 	if (!parsed.success) throw error(400, 'Invalid move');
@@ -25,7 +24,7 @@ export const POST = async ({ params, request, locals }) => {
 	try {
 		const game = await applyPlayerMove(
 			params.id,
-			session.user.userId,
+			locals.user.id,
 			parsed.data.from as Coord,
 			parsed.data.to as Coord
 		);

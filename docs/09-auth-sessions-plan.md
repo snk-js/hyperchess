@@ -1,6 +1,18 @@
 # Auth migration plan — roll-your-own sessions (Path A, the official path)
 
-*Branch `feat/auth-sessions`. Status: **plan mounted, implementation not started.***
+*Branch `feat/auth-sessions`. Status: **✅ implemented & verified** (2026-07-05).
+Lucia removed; `src/lib/server/auth/` in place; migration
+`20260705212617_reshape_session` applied; 54 unit tests + auth/rooms/match e2e
+green; production build passes. Sections below are the design as built.*
+
+> **As-built deltas from the plan:** session cookie is `hyperchess_session`;
+> session ids are 40-char base32 (25 random bytes); the old test users were
+> wiped (`TRUNCATE auth_user CASCADE`) since their Lucia scrypt hashes don't
+> verify under argon2 — re-signup to recreate. Note: the internal
+> `/api/{ws,publish,add,remove}` calls send a JSON string without a
+> `content-type`, so the browser labels them `text/plain`; SvelteKit's
+> re-enabled CSRF allows them because same-origin fetches carry a matching
+> `Origin` (server-to-server callers must send `Origin`, as the e2e scripts do).
 
 Replaces Lucia v2 with a hand-rolled session module, per Lucia's own guidance —
 the library (v2 **and** v3) is deprecated and is now a "learning resource":
