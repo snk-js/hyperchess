@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  unit:
+    name: unit tests + build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: npx prisma generate
+      - run: pnpm test
+      - run: pnpm build
+
+  integration:
+    name: e2e against the production server
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: hyperchessuser
+          POSTGRES_PASSWORD: hyperchess
+          POSTGRES_DB: hyperchess
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U hyperchessuser -d hyperchess"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://hyperchessuser:hyperchess@localhost:5432/hyperchess
+      ORIGIN: http://localhost:3000
+      BASE: http://localhost:3000
+      E2E_SECURE: '1' # production build sets the Secure cookie attribute
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: npx prisma generate
+      - run: npx prisma migrate deploy
+      - run: pnpm build
+
+      - name: start server
+        run: |
+          node server.js &
+          echo $! > server.pid
+          curl --retry 20 --retry-delay 1 --retry-connrefused -sf http://localhost:3000/healthcheck
+
+      - name: run e2e suite (auth + rooms + match over HTTP/WS)
+        run: pnpm e2e
+
+      - name: stop server
+        if: always()
+        run: kill "$(cat server.pid)" || true
