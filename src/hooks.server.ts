@@ -1,26 +1,26 @@
 import type { Handle } from '@sveltejs/kit';
-import { auth } from '$lib/server/lucia';
+import { validateSession } from '$lib/server/auth/session';
+import { SESSION_COOKIE, setSessionCookie, deleteSessionCookie } from '$lib/server/auth/cookie';
 
 export const handle: Handle = async ({ resolve, event }) => {
-	event.locals.auth = auth.handleRequest(event);
+	const sessionId = event.cookies.get(SESSION_COOKIE);
 
-	const response = await resolve(event);
-
-	if (event.url.pathname.startsWith('/api')) {
-		// Required for CORS to work
-		if (event.request.method === 'OPTIONS') {
-			response.headers.append(
-				'Access-Control-Allow-Methods',
-				'GET, POST, PUT, DELETE, PATCH, OPTIONS'
-			);
-			response.headers.append('Access-Control-Allow-Origin', '*');
-			response.headers.append('Access-Control-Allow-Headers', '*');
-		}
+	if (!sessionId) {
+		event.locals.user = null;
+		event.locals.session = null;
+		return resolve(event);
 	}
 
-	if (event.url.pathname.startsWith('/api')) {
-		response.headers.append('Access-Control-Allow-Origin', `*`);
+	const { session, user } = await validateSession(sessionId);
+	if (session) {
+		// refresh the cookie on sliding renewal
+		setSessionCookie(event.cookies, session.id, session.expiresAt);
+	} else {
+		deleteSessionCookie(event.cookies);
 	}
 
-	return response;
+	event.locals.user = user;
+	event.locals.session = session;
+
+	return resolve(event);
 };

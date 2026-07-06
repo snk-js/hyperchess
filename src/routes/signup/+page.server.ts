@@ -1,17 +1,17 @@
-import { auth } from '$lib/server/lucia';
 import { fail, redirect } from '@sveltejs/kit';
-
+import { prisma } from '$lib/server/prisma';
+import { hashPassword } from '$lib/server/auth/password';
+import { createSession } from '$lib/server/auth/session';
+import { setSessionCookie } from '$lib/server/auth/cookie';
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	const session = await locals.auth.validate();
-	console.log('signup load page server', { session });
-	if (session) throw redirect(302, '/');
+	if (locals.user) throw redirect(302, '/');
 	return {};
 };
 
 export const actions: Actions = {
-	default: async ({ request, locals }) => {
+	default: async ({ request, cookies }) => {
 		const formData = await request.formData();
 		const name = formData.get('name');
 		const username = formData.get('username');
@@ -19,54 +19,39 @@ export const actions: Actions = {
 		const email = formData.get('email');
 
 		if (typeof name !== 'string' || name.length < 2 || name.length > 31) {
-			return fail(400, {
-				message: 'Invalid username'
-			});
+			return fail(400, { message: 'Invalid name' });
 		}
 		if (typeof username !== 'string' || username.length < 4 || username.length > 20) {
-			return fail(400, {
-				message: 'Invalid username'
-			});
+			return fail(400, { message: 'Invalid username' });
 		}
 		if (typeof password !== 'string' || password.length < 6 || password.length > 255) {
-			return fail(400, {
-				message: 'Invalid password'
-			});
+			return fail(400, { message: 'Invalid password' });
 		}
+
+		const keyId = `username:${username.toLowerCase()}`;
+		const hashed = await hashPassword(password);
+
+		let userId: string;
 		try {
-			const user = await auth.createUser({
-				key: {
-					providerId: 'username', // auth method
-					providerUserId: username.toLowerCase(), // unique id when using "username" auth method
-					password // hashed by Lucia,
-				},
-				attributes: {
-					username,
+			const user = await prisma.authUser.create({
+				data: {
 					name,
-					email
+					username,
+					email: typeof email === 'string' && email ? email : null,
+					auth_key: { create: { id: keyId, hashed_password: hashed } }
 				}
 			});
-			console.log('new user', { user });
-			const session = await auth.createSession({
-				userId: user.userId,
-				attributes: {}
-			});
-			locals.auth.setSession(session); // set session cookie
+			userId = user.id;
 		} catch (e) {
-			// check for unique constraint error in user table
-			if (e) {
-				console.log({ e });
-				return fail(400, {
-					message: 'Username already taken'
-				});
+			// unique violation on username / key id / email
+			if (typeof e === 'object' && e && 'code' in e && e.code === 'P2002') {
+				return fail(400, { message: 'Username already taken' });
 			}
-			console.log('An unknown error occurred', { e });
-			return fail(500, {
-				message: 'An unknown error occurred'
-			});
+			return fail(500, { message: 'An unknown error occurred' });
 		}
-		// redirect to
-		// make sure you don't throw inside a try/catch block!
+
+		const session = await createSession(userId);
+		setSessionCookie(cookies, session.id, session.expiresAt);
 		throw redirect(302, '/');
 	}
 };

@@ -20,30 +20,23 @@ export async function listOpenRooms(): Promise<Room[]> {
 }
 
 /**
- * Persist a room owned by `ownerId` and broadcast the delta. The room id is
+ * Persist a room owned by `owner` and broadcast the delta. The room id is
  * server-generated (a timestamp, kept as a plain number for the client).
  * One open room per owner: an existing open room is returned as-is.
- *
- * The username is read from the DB rather than the session: Lucia v2 ignores
- * this project's legacy `transformDatabaseUser`, so `session.user` only carries
- * `userId` — see the Lucia note in docs/05-improvement-plan.md.
  */
 export async function createRoom(
-	ownerId: string,
+	owner: { id: string; username: string },
 	input: CreateRoomInput
 ): Promise<{ room: Room; created: boolean }> {
-	const owner = await prisma.authUser.findUnique({ where: { id: ownerId } });
-	if (!owner) throw new Error(`room owner ${ownerId} not found`);
-
 	const existing = await prisma.room.findFirst({
-		where: { ownerId, status: 'open' }
+		where: { ownerId: owner.id, status: 'open' }
 	});
 	if (existing) return { room: toClientRoom(existing), created: false };
 
 	const row = await prisma.room.create({
 		data: {
 			id: BigInt(Date.now()),
-			ownerId,
+			ownerId: owner.id,
 			username: owner.username,
 			rating: 0,
 			time: input.time,

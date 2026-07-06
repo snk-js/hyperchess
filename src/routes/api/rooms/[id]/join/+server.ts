@@ -7,14 +7,13 @@ const STATUS: Record<string, number> = {
 };
 
 export const POST = async ({ params, locals }) => {
-	const session = await locals.auth.validate();
-	if (!session) throw error(401, 'Not authenticated');
+	if (!locals.user) throw error(401, 'Not authenticated');
 
 	const roomId = Number(params.id);
 	if (!Number.isFinite(roomId)) throw error(400, 'Invalid room id');
 
 	try {
-		const game = await joinRoom(roomId, session.user.userId);
+		const game = await joinRoom(roomId, locals.user.id);
 		return json({ game }, { status: 201 });
 	} catch (e) {
 		const code = e instanceof Error ? e.message : 'UNKNOWN';

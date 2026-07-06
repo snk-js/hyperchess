@@ -50,6 +50,22 @@ I'd do first.
 
 ## Tier 2 — auth & security hardening
 
+> ✅ **Done (feat/auth-sessions):** Lucia fully removed and replaced with a
+> hand-rolled session module (`src/lib/server/auth/{session,password,cookie}.ts`)
+> over the existing Prisma tables — random base32 session ids, sliding half-life
+> renewal, argon2id hashing. This one change also: dropped the insecure manual
+> `secure:false` cookie, re-enabled SvelteKit CSRF (`checkOrigin` default) and
+> removed the wildcard CORS, and killed **both** Lucia v2 traps below (hooks now
+> attach the full `locals.user`; validation is ours, no Origin-gated `validate()`).
+> Removed deps: `lucia`, `@lucia-auth/adapter-prisma`, `@lucia-auth/oauth`, `uuid`
+> (+ Lucia `debugMode`/session `console.log`s). Verified: 54 unit tests + auth e2e
+> (signup/login/logout, HttpOnly+Lax cookie, JSON POST works without Origin,
+> cross-origin form POST blocked by CSRF, wrong password rejected). See
+> [09-auth-sessions-plan.md](09-auth-sessions-plan.md).
+> **Still open in this tier:** rate limiting on signup/login/publish.
+
+<details><summary>Original Tier 2 plan (for reference)</summary>
+
 - 🔴 **Migrate off Lucia entirely** (the whole library is deprecated — **v2 and
   v3 both**). Do **not** upgrade v2 → v3: v3 is deprecated too. Per the official
   guidance (<https://lucia-auth.com/lucia-v3/migrate>, session guide
@@ -90,6 +106,8 @@ I'd do first.
 - Rate limiting on signup/login and publish.
 - Turn off Lucia `debugMode`, strip `console.log`s of sessions/keys (they leak
   into server logs).
+
+</details>
 
 ## Tier 3 — stack refresh (you mentioned Svelte <5 deliberately)
 

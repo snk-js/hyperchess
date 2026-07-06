@@ -54,8 +54,7 @@
 	"type": "module",
 	"dependencies": {
 		"@floating-ui/dom": "^1.6.3",
-		"@lucia-auth/adapter-prisma": "^3.0.2",
-		"@lucia-auth/oauth": "^3.3.1",
+		"@node-rs/argon2": "^2",
 		"@prisma/client": "^5.5.2",
 		"@threlte/theatre": "^2.1.4",
 		"@types/lodash": "^4.14.197",
@@ -63,10 +62,8 @@
 		"dotenv": "^16.3.1",
 		"express": "^4.17.1",
 		"lodash": "^4.17.21",
-		"lucia": "^2.7.2",
 		"postprocessing": "^6.33.0",
 		"prisma": "^5.5.2",
-		"uuid": "^9.0.1",
 		"ws": "^8.18.0",
 		"zod": "^3.22.4"
 	}

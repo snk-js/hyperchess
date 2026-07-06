@@ -1,31 +1,18 @@
 import { redirect } from '@sveltejs/kit';
-import { prisma } from '$lib/server/prisma';
 import { listOpenRooms } from '$lib/server/rooms/service';
 import type { User } from '$lib/store/user';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, request }) => {
-	const session = await locals.auth.validate();
-	const userId = session?.user?.userId;
-	if (!userId) {
-		throw redirect(302, '/login');
-	}
-	const user = await prisma.authUser.findUnique({
-		where: {
-			id: userId
-		}
-	});
-
-	if (!user) {
-		console.log('no user');
+	if (!locals.user) {
 		throw redirect(302, '/login');
 	}
 
 	const userData: User = {
-		id: user.id,
-		name: user.name,
-		email: user.email || '',
-		username: user.username,
+		id: locals.user.id,
+		name: locals.user.name,
+		email: locals.user.email || '',
+		username: locals.user.username,
 		clientId: '',
 		wsUrl: '',
 		playing: false

@@ -6,10 +6,9 @@ const config = {
 	preprocess: [vitePreprocess({})],
 
 	kit: {
-		adapter: adapter(),
-		csrf: {
-			checkOrigin: false
-		}
+		adapter: adapter()
+		// CSRF origin check left at its secure default now that everything is
+		// same-origin (the external ws relay that needed it is gone).
 	}
 };
 
