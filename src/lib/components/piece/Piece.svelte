@@ -6,9 +6,11 @@
 	import type { Cell, PieceCoords } from '$lib/store/';
 	import { board, dummyCell } from '$lib/store/';
 	import { updateCellStatus } from '$lib/store/cellStates';
+	import { gameStore, isMyTurn } from '$lib/store/game';
+	import { pushNotification } from '$lib/store/toast';
 	import { get } from 'svelte/store';
 	import Pieces from './Pieces.svelte';
-	import { selectedPiece } from '../cubeStatus/CubeStatus.svelte';
+	import { selectedPiece, addToMovePiece } from '../cubeStatus/CubeStatus.svelte';
 
 	export const ref = new Group();
 	export let idx: PieceCoords = [0, 0, 0];
@@ -40,6 +42,23 @@
 
 	const handleClick = (e: Event) => {
 		e.stopPropagation();
+		const game = get(gameStore);
+
+		if (game) {
+			// enemy piece: if it's a highlighted capture target, take it
+			if (cell.side !== game.myColor) {
+				const fresh = get(board[cell.coords[0]][cell.coords[1]][cell.coords[2]]);
+				if (fresh.highlighted.activated && get(selectedPiece).length) {
+					addToMovePiece(cell.coords);
+				}
+				return;
+			}
+			if (!isMyTurn()) {
+				pushNotification({ message: 'Not your turn', type: 'error' });
+				return;
+			}
+		}
+
 		updateCellStatus([cell.coords], 'selected', true);
 		selectedPiece.set(cell.coords);
 	};

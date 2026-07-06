@@ -1,8 +1,18 @@
 <script context="module" lang="ts">
 	import { writable } from 'svelte/store';
+	import { gameStore } from '$lib/store/game';
+	import { sendMove } from '$lib/async/websockets/match/handler';
+
 	export const selectedPiece = writable<PieceCoords>([]);
 	export function addToMovePiece(coords: PieceCoords) {
-		movePiece(get(selectedPiece), coords);
+		const from = get(selectedPiece);
+		if (get(gameStore)) {
+			// in a match the server is authoritative: POST the move and let the
+			// resulting MATCH delta re-hydrate the board
+			void sendMove(from, coords);
+			return;
+		}
+		movePiece(from, coords);
 	}
 </script>
 
