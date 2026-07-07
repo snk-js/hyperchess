@@ -47,14 +47,15 @@ match server e2e, svelte-check (no new errors), production build, lobby SSR.
 
 ## Known gaps / follow-ups
 
-- **Reconnect**: after a reload the game isn't rejoined automatically
-  (`GET /api/games/[id]` exists; needs a "current game" lookup + auto-enter).
-- **Escape** leaves the board view but the match stays active (no
-  resign/abandon lifecycle yet).
+- ✅ **Reconnect** (done, PR #10): `GET /api/games/current` + auto-enter after
+  the lobby socket connects.
+- ✅ **Resign** (done, PR #12): Escape in an active match confirms → resigns
+  (`POST /api/games/[id]/resign` → `game_over` delta → opponent wins).
 - Local sandbox `movePiece` still swaps pieces (no capture) — match mode is
   unaffected (server board is authoritative).
 - No optimistic move application (small perceived latency: move renders when
   the delta returns).
+- No draw offer / threefold / clocks (Tier 5 game features).
 
 ---
 
