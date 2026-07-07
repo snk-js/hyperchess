@@ -18,7 +18,11 @@ assert(!!cookie, `signup set ${COOKIE} cookie (status ${signup.status})`);
 const attrs = cookieAttrs(signup);
 assert(/HttpOnly/i.test(attrs), 'cookie is HttpOnly');
 assert(/SameSite=Lax/i.test(attrs), 'cookie is SameSite=Lax');
-assert(!/Secure/i.test(attrs), 'cookie has no Secure on localhost');
+// dev server omits Secure (http localhost); the production build sets it.
+// Scripts replay the cookie header directly, so both modes work — set
+// E2E_SECURE=1 when targeting a production server.
+const expectSecure = process.env.E2E_SECURE === '1';
+assert(/;\s*Secure/i.test(attrs) === expectSecure, `cookie Secure attribute matches mode (expect ${expectSecure})`);
 
 const authed = (c) => (path, opts = {}) =>
 	fetch(`${BASE}${path}`, { ...opts, headers: { ...(opts.headers || {}), cookie: c, origin: BASE } });
