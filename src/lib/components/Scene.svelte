@@ -1,10 +1,15 @@
 <script lang="ts">
 	import { T } from '@threlte/core';
-	import { OrbitControls } from '@threlte/extras';
+	import { OrbitControls, useGltf, interactivity } from '@threlte/extras';
+	import { setContext } from 'svelte';
 	import Cube from './cube/Cube.svelte';
 	import userStore from '$lib/store/user';
 	import { tweened } from 'svelte/motion';
-	import { cubicOut, sineIn } from 'svelte/easing';
+	import { sineIn } from 'svelte/easing';
+
+	interactivity();
+	const gltf = useGltf('scene-transformed.glb', { useDraco: true, useMeshopt: true });
+	setContext('gltf', gltf);
 
 	const xPositionMultiplier = tweened(-10, {
 		duration: 2000,
@@ -40,8 +45,6 @@
 			yPositionMultiplier.set(10);
 			zPositionMultiplier.set(10);
 			fovMultiplier.set(10);
-			// fov = 8;
-			// zpos = 15;
 		}
 	}
 </script>

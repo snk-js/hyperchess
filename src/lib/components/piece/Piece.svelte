@@ -1,18 +1,17 @@
 <script lang="ts">
-	import { Group } from 'three';
-	import { T, forwardEventHandlers } from '@threlte/core';
-	import { Align, useGltf } from '@threlte/extras';
-	import { interactivity } from '@threlte/extras';
+	import { T } from '@threlte/core';
+	import { Align } from '@threlte/extras';
 	import type { Cell, PieceCoords } from '$lib/store/';
 	import { board, dummyCell } from '$lib/store/';
 	import { updateCellStatus } from '$lib/store/cellStates';
 	import { gameStore, isMyTurn } from '$lib/store/game';
 	import { pushNotification } from '$lib/store/toast';
 	import { get } from 'svelte/store';
+	import { getContext } from 'svelte';
 	import Pieces from './Pieces.svelte';
 	import { selectedPiece, addToMovePiece } from '../cubeStatus/CubeStatus.svelte';
+	import type { ThrelteGltf } from '@threlte/extras';
 
-	export const ref = new Group();
 	export let idx: PieceCoords = [0, 0, 0];
 
 	let cell: Cell = dummyCell;
@@ -22,13 +21,9 @@
 		cell = get(cellStore);
 	}
 
-	interactivity();
-	const gltf = useGltf('scene-transformed.glb', {
-		useDraco: true,
-		useMeshopt: true
-	});
-
-	const component = forwardEventHandlers();
+	const gltf = getContext('gltf') as Promise<
+		ThrelteGltf<{ nodes: Record<string, any>; materials: Record<string, any> }>
+	>;
 
 	const handlePointerOver = (e: Event) => {
 		e.stopPropagation();
@@ -64,26 +59,19 @@
 	};
 </script>
 
-<T is={ref} dispose={false} {...$$restProps} bind:this={$component}>
-	{#await gltf}
-		<slot name="fallback" />
-	{:then gltf}
-		<Align auto>
-			<T.Group
-				rotation={(cell.side === 'black' && [0, 0, 3.15]) || [0, 0, 0]}
-				position={cell.side === 'black' ? [0, 5.5, 0] : [0, 1.8, 0]}
-				scale={0.5}
-				on:pointerover={handlePointerOver}
-				on:pointerout={handleMouseLeave}
-				on:click={handleClick}
-			>
-				{#if cell.piece}
-					<Pieces {gltf} side={cell.side} piece={cell.piece} />
-				{/if}
-			</T.Group>
-		</Align>
-	{:catch error}
-		<slot name="error" {error} />
-	{/await}
-	<slot {ref} />
-</T>
+{#await gltf then gltf}
+	<Align auto>
+		<T.Group
+			rotation={(cell.side === 'black' && [0, 0, 3.15]) || [0, 0, 0]}
+			position={cell.side === 'black' ? [0, 5.5, 0] : [0, 1.8, 0]}
+			scale={0.5}
+			on:pointerover={handlePointerOver}
+			on:pointerout={handleMouseLeave}
+			on:click={handleClick}
+		>
+			{#if cell.piece}
+				<Pieces {gltf} side={cell.side} piece={cell.piece} />
+			{/if}
+		</T.Group>
+	</Align>
+{/await}

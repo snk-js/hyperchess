@@ -6,6 +6,7 @@
 	import { tweened } from 'svelte/motion';
 	import { backInOut } from 'svelte/easing';
 	import InnerMash from '../innerCube/innerMash.svelte';
+	import PiecesLayer from '../piece/PiecesLayer.svelte';
 	import { board, boardUpdates } from '$lib/store';
 	import { updatedCells } from '$lib/store/cellStates';
 	import { get } from 'svelte/store';
@@ -58,6 +59,8 @@
 			{/each}
 		{/each}
 	{/each}
+
+	<PiecesLayer />
 
 	<GridDivider position={[1.31, 1.31, 1.31]} />
 	<T.LineSegments position={[1.31, 1.31, 1.31]}>

@@ -9,6 +9,8 @@ export type Side = 'white' | 'black' | '';
 // ----------------------->  x,      y,       z
 export type PieceCoords = number[];
 
+export type OccupiedCell = { coords: PieceCoords; piece: Exclude<Piece, ''>; side: Exclude<Side, ''> };
+
 export type CellStates = 'selected' | 'activated';
 
 export type CellStatesMapping = Partial<{
@@ -124,12 +126,21 @@ putPieces.forEach((pieceInfo) => {
 	}));
 });
 
+export const occupiedCells = writable<OccupiedCell[]>(
+	putPieces.map((p) => ({
+		coords: p.coords,
+		piece: p.piece as Exclude<Piece, ''>,
+		side: p.side as Exclude<Side, ''>
+	}))
+);
+
 /**
  * Replace the whole board from a serialized state (`"x,y,z" -> {piece, side}`),
  * clearing selection/highlight flags. Used when a match starts and after every
  * server-confirmed move (the server board is authoritative).
  */
 export const hydrateBoard = (state: Record<string, { piece: Piece; side: Side }>) => {
+	const next: OccupiedCell[] = [];
 	for (let x = 0; x < BOARDSIZE; x++) {
 		for (let y = 0; y < BOARDSIZE; y++) {
 			for (let z = 0; z < BOARDSIZE; z++) {
@@ -142,9 +153,17 @@ export const hydrateBoard = (state: Record<string, { piece: Piece; side: Side }>
 					activated: false,
 					highlighted: { activated: false, selected: false }
 				}));
+				if (entry?.piece && entry?.side) {
+					next.push({
+						coords: [x, y, z],
+						piece: entry.piece as Exclude<Piece, ''>,
+						side: entry.side as Exclude<Side, ''>
+					});
+				}
 			}
 		}
 	}
+	occupiedCells.set(next);
 };
 
 /** Serialize the current board into the shared rules-module shape. */
@@ -226,6 +245,29 @@ export const movePiece = (from: PieceCoords, to: PieceCoords) => {
 
 	exchangePiece(to, sourcePiece);
 	exchangePiece(from, target);
+
+	occupiedCells.update((cells) => {
+		const next = cells.filter(
+			(c) =>
+				!(c.coords[0] === x1 && c.coords[1] === y1 && c.coords[2] === z1) &&
+				!(c.coords[0] === x2 && c.coords[1] === y2 && c.coords[2] === z2)
+		);
+		if (sourcePiece.piece && sourcePiece.side) {
+			next.push({
+				coords: to,
+				piece: sourcePiece.piece as Exclude<Piece, ''>,
+				side: sourcePiece.side as Exclude<Side, ''>
+			});
+		}
+		if (target.piece && target.side) {
+			next.push({
+				coords: from,
+				piece: target.piece as Exclude<Piece, ''>,
+				side: target.side as Exclude<Side, ''>
+			});
+		}
+		return next;
+	});
 
 	boardUpdates.update((cells) => [...cells, [sourcePiece, target]]);
 };
