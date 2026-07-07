@@ -49,10 +49,20 @@ export async function enterMatchById(gameId: string): Promise<void> {
 	await enterMatch(game);
 }
 
-/** Apply a server-confirmed move: the delta's board is authoritative. */
+/** Apply a server-confirmed delta: the server state is authoritative. */
 export function matchDeltaHandler(delta: MatchDelta): void {
 	const current = get(gameStore);
 	if (!current) return;
+
+	if (delta.kind === 'game_over') {
+		gameStore.set({ ...current, status: 'finished', winnerId: delta.winnerId });
+		const won = delta.winnerId === get(userStore).id;
+		pushNotification({
+			message: won ? 'You won — your opponent resigned.' : 'You resigned.',
+			type: won ? 'success' : 'error'
+		});
+		return;
+	}
 
 	hydrateBoard(delta.board);
 	gameStore.set({
@@ -70,6 +80,19 @@ export function matchDeltaHandler(delta: MatchDelta): void {
 			type: won ? 'success' : 'error'
 		});
 	}
+}
+
+/** Resign the active game; the game_over delta finishes the UI transition. */
+export async function resignGame(): Promise<boolean> {
+	const game = get(gameStore);
+	if (!game || game.status !== 'active') return true; // nothing to resign
+
+	const res = await fetch(`/api/games/${game.id}/resign`, { method: 'POST' });
+	if (!res.ok && res.status !== 409) {
+		pushNotification({ message: 'Could not resign', type: 'error' });
+		return false;
+	}
+	return true;
 }
 
 /** POST a move; the resulting board arrives via the MATCH delta. */

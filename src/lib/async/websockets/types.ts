@@ -19,13 +19,20 @@ export type RoomDelta =
 	| { kind: 'game_started'; game: GameSummary };
 
 // Deltas broadcast on the per-game MATCH:<gameId> topic.
-export type MatchDelta = {
-	kind: 'move_applied';
-	from: Coord;
-	to: Coord;
-	turn: Side;
-	board: Record<string, PieceState>;
-	status: 'active' | 'finished';
-	winnerId: string | null;
-	captured: PieceState | null;
-};
+export type MatchDelta =
+	| {
+			kind: 'move_applied';
+			from: Coord;
+			to: Coord;
+			turn: Side;
+			board: Record<string, PieceState>;
+			status: 'active' | 'finished';
+			winnerId: string | null;
+			captured: PieceState | null;
+	  }
+	| {
+			kind: 'game_over';
+			status: 'finished';
+			winnerId: string | null;
+			reason: 'resign';
+	  };
