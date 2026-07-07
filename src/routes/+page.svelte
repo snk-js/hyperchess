@@ -10,6 +10,7 @@
 	import { isLoading } from '$lib/store/loading';
 	import Spinner from '$lib/components/loading/Spinner.svelte';
 	import { roomsEventHandler } from '$lib/async/websockets/rooms/handler';
+	import { enterMatch } from '$lib/async/websockets/match/handler';
 	import { roomsStore } from '$lib/store/rooms';
 
 	let loading = false;
@@ -62,26 +63,37 @@
 				};
 			});
 	}
+	const rejoinActiveGame = async () => {
+		// reconnect after a reload: if the server has an active game for us,
+		// re-enter it (hydrates the board and re-subscribes the MATCH topic)
+		try {
+			const res = await fetch('/api/games/current');
+			if (!res.ok) return;
+			const { game } = await res.json();
+			if (game) await enterMatch(game);
+		} catch (e) {
+			console.error('Failed to check for an active game:', e);
+		}
+	};
+
 	onMount(() => {
 		console.log('on mount');
 		// seed the lobby from the server snapshot before deltas start arriving
 		roomsStore.set(data.rooms ?? []);
 		const currentUser = get(userStore);
-		let ws: WebSocket | null = null;
 		// Ensure that this code runs only on the client side and currentUser has required properties
 		if (currentUser && currentUser.id) {
 			registerClient('ROOMS', roomsEventHandler, currentUser)
 				.then((client) => {
 					if (client && client.readyState === 1) {
-						userStore.set({
-							...currentUser,
-							ws
-						});
+						// update, not set: registration just stored clientId in the store
+						userStore.update((u) => ({ ...u, ws: client }));
 						console.log('WebSocket connected');
 						pushNotification({
 							message: 'Rooms WebSocket connected',
 							type: 'success'
 						});
+						void rejoinActiveGame();
 					}
 				})
 				.catch((e) => {
