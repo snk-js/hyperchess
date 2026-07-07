@@ -12,8 +12,8 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write .",
-		"test": "vitest run",
-		"test:watch": "vitest",
+		"test": "svelte-kit sync && vitest run",
+		"test:watch": "svelte-kit sync && vitest",
 		"e2e": "node e2e/seed.mjs && node e2e/auth.e2e.mjs && node e2e/rooms.e2e.mjs && node e2e/match.e2e.mjs",
 		"model-pipeline:run": "node scripts/model-pipeline.js"
 	},
