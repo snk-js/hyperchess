@@ -93,6 +93,28 @@ export async function getGame(gameId: string): Promise<GameState | null> {
 	return game ? toState(game) : null;
 }
 
+/** Resign: the opponent wins immediately; both players get a game_over delta. */
+export async function resignGame(gameId: string, userId: string): Promise<GameState> {
+	const game = await prisma.game.findUnique({ where: { id: gameId } });
+	if (!game) throw new Error('GAME_NOT_FOUND');
+	if (game.status !== 'active') throw new Error('GAME_OVER');
+
+	const isWhite = userId === game.whitePlayerId;
+	const isBlack = userId === game.blackPlayerId;
+	if (!isWhite && !isBlack) throw new Error('NOT_A_PARTICIPANT');
+
+	const winnerId = isWhite ? game.blackPlayerId : game.whitePlayerId;
+	const updated = await prisma.game.update({
+		where: { id: gameId },
+		data: { status: 'finished', winnerId }
+	});
+
+	const delta: MatchDelta = { kind: 'game_over', status: 'finished', winnerId, reason: 'resign' };
+	publish(matchTopic(gameId), JSON.stringify(delta));
+
+	return toState(updated);
+}
+
 /** The player's active game, if any — used to reconnect after a reload. */
 export async function getCurrentGameFor(userId: string): Promise<GameState | null> {
 	const game = await prisma.game.findFirst({

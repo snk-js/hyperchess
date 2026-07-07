@@ -11,9 +11,16 @@ for (const r of (await (await p1('/api/rooms')).json()).rooms.filter((r) => r.ow
 	await p1(`/api/rooms/${r.id}`, { method: 'DELETE' });
 }
 
-// NOTE: earlier runs may leave active games (no resign/abandon endpoint yet);
-// /api/games/current returns the NEWEST active game, so the assertions below
-// stay valid on repeat runs.
+// clean slate: resign any active games left over from earlier runs
+for (const p of [p1, p2]) {
+	for (let i = 0; i < 10; i++) {
+		const { game } = await (await p('/api/games/current')).json();
+		if (!game) break;
+		await p(`/api/games/${game.id}/resign`, { method: 'POST' });
+	}
+}
+const pre = await (await p1('/api/games/current')).json();
+assert(pre.game === null, 'no active game before the match (leftovers resigned)');
 
 // create + join
 const createRes = await p1('/api/rooms', {
@@ -96,6 +103,31 @@ const stateRes = await p1(`/api/games/${game.id}`);
 assert(stateRes.status === 200, 'participant can GET game state');
 const unauth = await fetch(`${BASE}/api/games/${game.id}`);
 assert(unauth.status === 401, 'unauthenticated GET rejected');
+
+// resign: black (p2) resigns -> white (p1) wins, both get game_over
+const resignRes = await p2(`/api/games/${game.id}/resign`, { method: 'POST' });
+assert(resignRes.status === 200, `resign accepted (200, got ${resignRes.status})`);
+const resigned = (await resignRes.json()).game;
+assert(resigned.status === 'finished' && resigned.winnerId === game.whitePlayerId, 'resigning as black makes white the winner');
+
+await wait(200);
+const over1 = c1.msgs.find((m) => m.kind === 'game_over');
+assert(over1 && over1.winnerId === game.whitePlayerId && over1.reason === 'resign', 'p1 received game_over(resign) with the right winner');
+assert(c2.msgs.some((m) => m.kind === 'game_over'), 'p2 received game_over too');
+
+// game is over: further moves and repeat resigns are rejected
+const postMove = await p2(`/api/games/${game.id}/move`, {
+	method: 'POST', headers: { 'content-type': 'application/json' },
+	body: JSON.stringify({ from: [2, 5, 2], to: [2, 4, 2] })
+});
+assert(postMove.status === 409, `move after game over rejected (409, got ${postMove.status})`);
+const resignAgain = await p2(`/api/games/${game.id}/resign`, { method: 'POST' });
+assert(resignAgain.status === 409, `second resign rejected (409, got ${resignAgain.status})`);
+
+// no active game remains for either player (reconnect returns null)
+const post1 = await (await p1('/api/games/current')).json();
+const post2 = await (await p2('/api/games/current')).json();
+assert(post1.game === null && post2.game === null, 'no active game after resign (e2e leaves no leftovers)');
 
 c1.ws.close();
 c2.ws.close();

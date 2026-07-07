@@ -44,6 +44,7 @@ export const roomsEventHandler = (event: MessageEvent) => {
 			break;
 		}
 		case 'move_applied':
+		case 'game_over':
 			matchDeltaHandler(delta);
 			break;
 	}
